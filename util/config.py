@@ -12,13 +12,16 @@ class ConfigManager(object):
     def __init__(self):
         ConfigManager.instance = self
         
-        self.parsers = { }
+        self.parsers = {}
         
         dir = os.path.join('resources','config')
         
         for file in os.listdir(os.path.join('resources','config')):
             filepath = os.path.join(dir, file)
             filename = '.'.join(file.split('.')[:-1])
+            
+            if (not os.path.isfile(filepath)):
+                continue
             
             fd = open(filepath,'r')
             self.parsers[filename] = ConfigParser()
