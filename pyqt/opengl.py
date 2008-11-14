@@ -34,13 +34,6 @@ class GLController(QGLWidget):
         self.adjustWidget()
         self.adjustTimer()
     
-        self.test_model = GLModel(open(
-            'resources/models/long-spaceship/long-spaceship.ply')
-        )
-        self.test_model.x_r = 0
-        self.test_model.y_r = 0
-        self.test_model.z_r = 0
-    
     def adjustWidget(self):
         self.setAttribute(Qt.WA_KeyCompression,False)
         self.setMouseTracking(True)
@@ -66,6 +59,13 @@ class GLController(QGLWidget):
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
                 
         glClearColor(*map(lambda c : c / 255.0, self.clearColor))
+        
+        self.test_model = GLModel(open(
+            'resources/models/long-spaceship/long-spaceship.ply')
+        )
+        self.test_model.x_r = 0
+        self.test_model.y_r = 0
+        self.test_model.z_r = 0
 
     def resizeGL(self, width, height):
         QGLWidget.resizeGL(self,width,height)
@@ -106,7 +106,7 @@ class GLController(QGLWidget):
         self.test_model.z_r += 0.1
         self.test_model.y_r += 0.2
         
-        self.test_model.direct_draw()
+        self.test_model.draw()
         
         glPopMatrix()
     
@@ -116,6 +116,8 @@ class GLController(QGLWidget):
         self.last_time = new_time
         
         self.fps = 1 / elapsed
+        
+        #print 'fps = ', self.fps
         
         #TODO: atualizar o estado dos objetos aqui
         
