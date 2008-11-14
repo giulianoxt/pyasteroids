@@ -78,7 +78,8 @@ class PLYModel(dict):
                         
                         for j in xrange(size):
                             p_val.append(cast(line[i + j + 1]))
-                            
+                        
+                        properties[p.name] = p_val
                         i += j + 1
                 
                 l.append(properties)
@@ -106,5 +107,6 @@ if (__name__ == '__main__'):
     try:
         ply = PLYModel(f)
         print ply
+        print ply['face'][0]
     finally:
         f.close()
