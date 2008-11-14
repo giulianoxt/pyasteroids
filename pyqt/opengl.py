@@ -9,6 +9,7 @@ from PyQt4.QtCore import Qt, QTimer, QObject
 
 from util.config import Config
 
+from model.opengl import GLModel
 
 class GLController(QGLWidget):
     instance = None
@@ -33,6 +34,13 @@ class GLController(QGLWidget):
         self.adjustWidget()
         self.adjustTimer()
     
+        self.test_model = GLModel(open(
+            'resources/models/long-spaceship/long-spaceship.ply')
+        )
+        self.test_model.x_r = 0
+        self.test_model.y_r = 0
+        self.test_model.z_r = 0
+    
     def adjustWidget(self):
         self.setAttribute(Qt.WA_KeyCompression,False)
         self.setMouseTracking(True)
@@ -47,6 +55,7 @@ class GLController(QGLWidget):
         glShadeModel(GL_SMOOTH)
         
         glEnable(GL_BLEND)
+        glEnable(GL_DEPTH_TEST)
         glEnable(GL_LINE_SMOOTH)
         glEnable(GL_POINT_SMOOTH)
         
@@ -65,10 +74,18 @@ class GLController(QGLWidget):
         
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
-        gluOrtho2D(0,width-1,height-1,0)
+        
+        cfg = Config('game','OpenGL')
+        fovy = cfg.get('y_field_of_view')
+        z_near = cfg.get('z_near')
+        z_far = cfg.get('z_far')
+        gluPerspective(fovy,float(width)/height,z_near,z_far)
         
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
+        
+        # TODO: CAMERA PROVISORIA! fazer uma classe Camera
+        gluLookAt(0.,0.,50.,0.,0.,-1.,0.,1.,0.)
 
     def paintGL(self):
         glMatrixMode(GL_MODELVIEW)
@@ -76,7 +93,20 @@ class GLController(QGLWidget):
         
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         
-        # TODO: draw
+        # TODO: esquema de drawing. Isso aqui eh soh pra teste
+        glScalef(.5,.5,.5)
+        
+        glTranslatef(0.,0.,-200.)
+        
+        glRotatef(self.test_model.x_r,1.,0.,0.)
+        glRotatef(self.test_model.y_r,0.,1.,0.)
+        glRotatef(self.test_model.z_r,0.,0.,1.)
+        
+        self.test_model.x_r += 0.2
+        self.test_model.z_r += 0.1
+        self.test_model.y_r += 0.2
+        
+        self.test_model.direct_draw()
         
         glPopMatrix()
     
@@ -87,7 +117,7 @@ class GLController(QGLWidget):
         
         self.fps = 1 / elapsed
         
-        #TODO: tick
+        #TODO: atualizar o estado dos objetos aqui
         
         self.updateGL()
     
