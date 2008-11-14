@@ -5,9 +5,7 @@
 class PLYModel(dict):
     "map element_name -> list of elements"
     
-    def __init__(self, filename):
-        file = open(filename, 'r')
-        
+    def __init__(self, file):       
         if (file.readline().strip() != 'ply'):
             raise Exception('File not in .ply format')
         
@@ -39,13 +37,55 @@ class PLYModel(dict):
                         skipline = line
                         break
                     
-                    element.properties.append(PropertyHeader(line[2],line[1]))
+                    element.properties.append(PropertyHeader(line[-1],line[1:-1]))
                 
                 self.elements.append(element)
             elif (cod == 'end_header'):
                 break
+            else:
+                raise Exception('Invalid header component: ' + cod)
 
+        self.parseElements(file)
+    
+    def parseElements(self, file):
+        cast_func = {
+            'int32'   : int,
+            'int8'    : int,
+            'uint8'   : int,
+            'uint32'  : int,
+            'float32' : float,
+            'string'  : lambda x : x
+        }
+        
+        for el in self.elements:
+            l = [] 
             
+            for i in xrange(el.count):
+                line = file.readline().strip().split()
+                
+                i = 0
+                properties = {}
+                
+                for p in el.properties:
+                    if (not p.type.startswith('list')):
+                        properties[p.name] = cast_func[p.type](line[i])
+                        i += 1
+                    else:
+                        p_val = []
+                        size = int(line[i])
+                        type = p.type.split()[2]
+                        cast = cast_func[type]
+                        
+                        for j in xrange(size):
+                            p_val.append(cast(line[i + j + 1]))
+                            
+                        i += j + 1
+                
+                l.append(properties)
+                    
+            self[el.name] = l 
+
+
 class ElementHeader(object):
     def __init__(self, name, count):
         self.name = name
@@ -56,14 +96,15 @@ class ElementHeader(object):
 class PropertyHeader(object):
     def __init__(self, name, type):
         self.name = name
-        self.type = type
-
+        self.type = ' '.join(type)
 
 
 # Testing
 if (__name__ == '__main__'):
-    ply = PLYModel('../resources/models/long-spaceship/long-spaceship.ply')
+    f = open('../resources/models/long-spaceship/long-spaceship.ply')
     
-    for el in ply.elements:
-        print 'el.name = ', el.name
-        print 'el.count = ', el.count
+    try:
+        ply = PLYModel(f)
+        print ply
+    finally:
+        f.close()
