@@ -2,6 +2,10 @@ import os
 
 from ConfigParser import ConfigParser
 
+
+_config_dir = os.path.join('resources','config')
+
+
 class ConfigManager(object):
     instance = None
     
@@ -14,9 +18,9 @@ class ConfigManager(object):
         
         self.parsers = {}
         
-        dir = os.path.join('resources','config')
+        dir = _config_dir
         
-        for file in os.listdir(os.path.join('resources','config')):
+        for file in os.listdir(dir):
             filepath = os.path.join(dir, file)
             filename = '.'.join(file.split('.')[:-1])
             

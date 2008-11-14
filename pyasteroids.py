@@ -7,13 +7,11 @@ from PyQt4.QtGui import QApplication
 from pyqt.main_window import AsteroidsMainWindow
 from util.config import ConfigManager
 
-def start_pyasteroids():
+def setup_modules():
     random.seed()
     
     # Faster processing
     psyco.full()
-
-    a = QApplication(argv)
 
     # Load the config files in memory
     ConfigManager()
@@ -24,9 +22,13 @@ def start_pyasteroids():
     # Pop-up the window
     win.show()
 
+def start_pyasteroids(a):
     # Gives control to Qt
     a.exec_()
 
 
 if __name__ == '__main__':
-    start_pyasteroids()
+    app = QApplication(argv)
+    
+    setup_modules()
+    start_pyasteroids(app)

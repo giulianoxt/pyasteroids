@@ -45,9 +45,9 @@ class PLYModel(dict):
             else:
                 raise Exception('Invalid header component: ' + cod)
 
-        self.parseElements(file)
+        self.parse_elements(file)
     
-    def parseElements(self, file):
+    def parse_elements(self, file):
         cast_func = {
             'int32'   : int,
             'int8'    : int,
@@ -73,14 +73,15 @@ class PLYModel(dict):
                     else:
                         p_val = []
                         size = int(line[i])
+                        i += 1
                         type = p.type.split()[2]
                         cast = cast_func[type]
                         
                         for j in xrange(size):
-                            p_val.append(cast(line[i + j + 1]))
+                            p_val.append(cast(line[i]))
+                            i += 1
                         
                         properties[p.name] = p_val
-                        i += j + 1
                 
                 l.append(properties)
                     
@@ -106,7 +107,8 @@ if (__name__ == '__main__'):
     
     try:
         ply = PLYModel(f)
-        print ply
-        print ply['face'][0]
+        print ply               # mesh inteira, como um dicionario
+        print ply['vertex'][10] # 11o vertice da mesh
+        print ply['face'][0]    # 1a face da mesh 
     finally:
         f.close()
