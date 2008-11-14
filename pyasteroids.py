@@ -1,4 +1,3 @@
-import psyco
 import random
 
 from sys import argv
@@ -11,7 +10,13 @@ def setup_modules():
     random.seed()
     
     # Faster processing
-    psyco.full()
+    try:
+        import psyco
+        psyco.full()
+    except:
+        print 'You currently do not have the Psyco module in your PYTHONPATH.'
+        print 'It is highly advisable to install it for a much better gaming performance.'
+        print 'Official site: http://psyco.sourceforge.net/'
 
     # Load the config files in memory
     ConfigManager()
@@ -28,6 +33,8 @@ def start_pyasteroids(a):
 
 
 if __name__ == '__main__':
+    print '# PyAsteroids3D #\n'
+    
     app = QApplication(argv)
     
     setup_modules()
