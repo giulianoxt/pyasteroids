@@ -65,9 +65,9 @@ class GLModel(object):
 
 # Testing
 if (__name__ == '__main__'):  
-    f = open('../resources/models/long-spaceship/long-spaceship.ply')
+    f = open('../resources/models/long-spaceship/long-spaceship.ply','r')
     
     try:
-        model = GLModel(f)
+        model = GLModel(f) 
     finally:
         f.close()
