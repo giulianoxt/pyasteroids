@@ -69,6 +69,8 @@ class GLController(QGLWidget):
                 
         glClearColor(*map(lambda c : c / 255.0, self.clearColor))
         
+        
+        
         # TODO: remover isso abaixo. Soh pra testes
         
         self.test_model = GLModel(open(
@@ -104,6 +106,7 @@ class GLController(QGLWidget):
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
         
+        
         # TODO: CAMERA PROVISORIA! fazer uma classe Camera
         gluLookAt(0.,0.,50.,0.,0.,-1.,0.,1.,0.)
 
@@ -113,16 +116,13 @@ class GLController(QGLWidget):
         
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         
+        
         # TODO: esquema de drawing. Isso aqui eh soh pra teste
         glScalef(10.,10.,10.)
               
         glRotatef(self.test_model.x_r,1.,0.,0.)
         glRotatef(self.test_model.y_r,0.,1.,0.)
         glRotatef(self.test_model.z_r,0.,0.,1.)
-        
-        self.test_model.x_r += 0.2
-        self.test_model.z_r += 0.1
-        self.test_model.y_r += 0.2
         
         self.test_model.draw()
         
@@ -135,9 +135,13 @@ class GLController(QGLWidget):
         
         self.fps = 1 / elapsed
         
-        #print 'fps = ', self.fps
+        #print 'fps = ', int(self.fps)
+        
         
         #TODO: atualizar o estado dos objetos aqui
+        self.test_model.x_r += 0.2
+        self.test_model.z_r += 0.1
+        self.test_model.y_r += 0.2
         
         self.updateGL()
     

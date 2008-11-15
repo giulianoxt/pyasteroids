@@ -54,7 +54,7 @@ class PLYModel(dict):
             'uint8'   : int,
             'uint32'  : int,
             'float32' : float,
-            'string'  : lambda x : x
+            'string'  : lambda x : x[1:-1]
         }
         
         for el in self.elements:
