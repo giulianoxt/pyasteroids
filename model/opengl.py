@@ -53,6 +53,8 @@ class GLModel(object):
             glTexImage2D(GL_TEXTURE_2D, 0, 3, img.width(), img.height(),
                 0, GL_RGBA, GL_UNSIGNED_BYTE, img.bits().asstring(img.numBytes()))
             
+            glBindTexture(GL_TEXTURE_2D, 0)
+            
         if (not any(self.textures)):
             self.textures = None           
     
@@ -73,20 +75,17 @@ class GLModel(object):
             return (textures and textures[f['material_index']])
         
         for f in faces:
+            ht = has_texture(f)
+            
+            if (ht):
+                glBindTexture(GL_TEXTURE_2D, textures[f['material_index']])
+            
             v_index_l = f['vertex_indices']
             
             if (len(v_index_l) == 3):
                 glBegin(GL_TRIANGLES)
             else:
                 glBegin(GL_QUADS)
-            
-            ht = has_texture(f)
-            
-            if (ht):
-                # BUG: descomentar isso aqui da erro
-                # sem isso, soh funciona pra modelos com um unico arquivo de textura
-                #glBindTexture(GL_TEXTURE_2D, textures[f['material_index']])
-                pass
             
             for v in (vertex_list[i] for i in v_index_l):
                 glNormal3f(v['nx'],v['ny'],v['nz'])
@@ -97,6 +96,9 @@ class GLModel(object):
                 glVertex3f(v['x'],v['y'],v['z'])
             
             glEnd()
+            
+            if (ht):
+                glBindTexture(GL_TEXTURE_2D, 0)
     
     def draw(self):
         glMatrixMode(GL_MODELVIEW)
