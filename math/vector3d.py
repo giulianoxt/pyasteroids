@@ -1,6 +1,13 @@
-# Version 0.1
+# Version 0.2
 # 15/11/2008
 
+from cmath import *
+
+def atan2(y, x):
+	if ( x == 0 ):
+		return (pi()/2.0)
+	else:
+		return atan(y/x)
 
 class Vector3d:
 	
@@ -21,7 +28,7 @@ class Vector3d:
 		return Vector3d(self.x - vec3d.x, self.y - vec3d.y, self.z - vec3d.z)
 	
 	# dot scalar
-	def __mult__(self, vec3d):
+	def __mul__(self, vec3d):
 		return (self.x*vec3d.x + self.y*vec3d.y + self.z*vec3d.z)
 	
 	# cross product
@@ -36,7 +43,7 @@ class Vector3d:
 		return acos( (self*vec3d)/(self.get_mod()*vec3d.get_mod()) )
 	
 	# scalar multiplication
-	def __mult__(self, k):
+	def scalar(self, k):
 		return Vector3d(self.x*k, self.y*k, self.z*k)
 	
 	# returns a unitary vector
