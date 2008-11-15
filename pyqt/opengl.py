@@ -45,27 +45,47 @@ class GLController(QGLWidget):
         self.timer.start(1000.0 / self.fps)
        
     def initializeGL(self):
+        # Enable color blending in polygons
+        glEnable(GL_BLEND)
         glShadeModel(GL_SMOOTH)
         
-        glEnable(GL_BLEND)
+        # Z-buffer testing
         glEnable(GL_DEPTH_TEST)
+        glDepthFunc(GL_LEQUAL)
+        
+        # Texture handling
+        glEnable(GL_TEXTURE_2D)
+        
+        # Enable antialiasing for all primitive renders
         glEnable(GL_LINE_SMOOTH)
         glEnable(GL_POINT_SMOOTH)
-        
         glHint(GL_LINE_SMOOTH_HINT, GL_NICEST)
         glHint(GL_POINT_SMOOTH_HINT, GL_NICEST)
         glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST)
+        glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
         
+        # Enable transparency by alpha value
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
                 
         glClearColor(*map(lambda c : c / 255.0, self.clearColor))
         
+        # TODO: remover isso abaixo. Soh pra testes
+        
         self.test_model = GLModel(open(
-            'resources/models/long-spaceship/long-spaceship.ply')
+            'resources/models/planets/io.ply')
         )
         self.test_model.x_r = 0
         self.test_model.y_r = 0
         self.test_model.z_r = 0
+        
+        glEnable(GL_LIGHTING)
+        
+        glMaterialfv(GL_FRONT, GL_AMBIENT, (.5,.5,.5,1.))
+        glLightfv(GL_LIGHT0, GL_AMBIENT, (.9,.9,.9,.8))
+        glLightfv(GL_LIGHT0, GL_POSITION, (0.,500.,10000.,1.))
+
+        glEnable(GL_LIGHT0) 
+        
 
     def resizeGL(self, width, height):
         QGLWidget.resizeGL(self,width,height)
@@ -94,10 +114,8 @@ class GLController(QGLWidget):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         
         # TODO: esquema de drawing. Isso aqui eh soh pra teste
-        glScalef(.5,.5,.5)
-        
-        glTranslatef(0.,0.,-200.)
-        
+        glScalef(10.,10.,10.)
+              
         glRotatef(self.test_model.x_r,1.,0.,0.)
         glRotatef(self.test_model.y_r,0.,1.,0.)
         glRotatef(self.test_model.z_r,0.,0.,1.)

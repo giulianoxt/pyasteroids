@@ -5,6 +5,9 @@
 
 from OpenGL.GL import *
 
+from PyQt4.QtGui import QImage
+from PyQt4.QtOpenGL import QGLWidget
+
 from model.ply import PLYModel
 
 
@@ -14,16 +17,45 @@ class GLModel(object):
         
         self.setup_dl = None
         self.main_dl = None
+        self.textures = None
         
         if (not 'vertex' in self.ply or not 'face' in self.ply):
             raise Exception('Invalid PLY model')
         
-        self.generate_textures()
+        if ('material' in self.ply and 'material_index' in self.ply['face'][0]):
+            self.generate_textures()      
+    
         self.generate_display_list()
     
     def generate_textures(self):
-        # TODO: use texture information on the PLYMode, if existing
-        pass
+        num_text = len(self.ply['material'])
+        
+        self.textures = glGenTextures(num_text)
+        
+        if (num_text == 1):
+            self.textures = (self.textures,)
+        
+        for i in xrange(num_text):
+            text_id = self.textures[i]
+            text_path = self.ply['material'][i]['texture_map'].strip()
+            
+            if (not len(text_path)):
+                self.textures[i] = None
+
+            glBindTexture(GL_TEXTURE_2D, text_id)
+
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+            
+            img = QImage(text_path)
+            img = QGLWidget.convertToGLFormat(img)
+            
+            glTexImage2D(GL_TEXTURE_2D, 0, 3, img.width(), img.height(),
+                0, GL_RGBA, GL_UNSIGNED_BYTE, img.bits())
+            
+            
+        if (not any(self.textures)):
+            self.textures = None           
     
     def generate_display_list(self):
         self.main_dl = glGenLists(1)
@@ -36,6 +68,10 @@ class GLModel(object):
     def direct_draw(self):
         faces = self.ply['face']
         vertex_list = self.ply['vertex']
+        textures = self.textures
+        
+        def has_texture(face):
+            return (textures and textures[f['material_index']])
         
         for f in faces:
             v_index_l = f['vertex_indices']
@@ -44,10 +80,18 @@ class GLModel(object):
                 glBegin(GL_TRIANGLES)
             else:
                 glBegin(GL_QUADS)
-                
+            
+            ht = has_texture(f)
+            
+            if (ht):
+                glBindTexture(GL_TEXTURE_2D, textures[f['material_index']])
+            
             for v in (vertex_list[i] for i in v_index_l):
                 glNormal3f(v['nx'],v['ny'],v['nz'])
-                # TODO: use texture information on the PLYMode, if existing
+                
+                if (ht):
+                    glTexCoord2f(v['s'],v['t'])
+
                 glVertex3f(v['x'],v['y'],v['z'])
             
             glEnd()
