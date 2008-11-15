@@ -66,6 +66,16 @@ class GLModel(object):
         
         del self.ply
 
+    def __del__(self):
+        if (self.textures):
+            glDeleteTextures(self.textures)
+        
+        if (self.setup_dl):
+            glDeleteLists(self.setup_dl, 1)
+        
+        if (self.main_dl):
+            glDeleteLists(self.main_dl, 1)
+
     def direct_draw(self):
         faces = self.ply['face']
         vertex_list = self.ply['vertex']
