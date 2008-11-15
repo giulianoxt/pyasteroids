@@ -1,0 +1,125 @@
+###
+# Primeiro arquivo de nível, criado na mão
+# serve de referência para a nossa implementação
+###
+
+
+# Título do level
+name: First crusade
+
+
+# Elementos básicos presentes no level. O usuário escolhe no editor
+# e adiciona pro level que ele tá montando
+elements:
+        -
+                # Título e subtítulo que vão aparecer na interface
+                # quando o jogador mirar nesse elemento com a arma
+                name: Io
+                subtitle: Jupiter moon
+
+                # Type indica como o jogo irá interpretar esse elemento (planet, asteroid, portais, (?))
+                type: planet
+
+                model:
+                        # Caminho para o modelo deste elemento (partindo de resources/models)
+                        file: planets/io.ply
+                        # Aplica esse scale antes de desenhar [opcional]
+                        scale: 10
+
+                # Indica se os tiros afetam esse elemento
+                destructible: yes
+                # Life do elemento, só aparece se destructible = yes
+                hp: 10000
+
+                # Indica se uma colisao com a nave tira hp da nave
+                destroys_player: yes
+
+                # Informações do shape do elemento (utilizado para detecção de colisão)
+                shape:
+                        type: bounding_sphere
+
+        -
+                name: Jupiter
+                subtitle: Gas giant
+
+                type: planet
+
+                model:
+                        file: planets/jupiter.ply
+
+                destructible: no
+
+                destroys_player: yes
+
+                shape:
+                        # Bounding sphere (BS), axis-aligned-bounding-box (AABB) ou oriented-bounding-box (OBB)
+                        type: bounding_sphere
+
+        -
+                name: Begin
+                subtitle: Start portal
+
+                # Este tipo indica o portal onde a nave começa na fase
+                type: start_portal
+
+                model:
+                        file: portals/basic-portal.ply
+
+                destroys_player: no
+
+                shape:
+                        type: bounding_box
+
+
+scene:
+        # Dimensões da cena. x, y e z  vão de -1000 à 1000
+        # quando um objeto ultrapassa esses limites, ele "warpa" para
+        # para o lado oposto, como no asteroids 2d
+        dimensions: [2000,2000,2000]
+
+        # Indica os posicionamentos dos elementos acima. não podemos
+        # colocar o posicionamento no item anterior porque um elemento
+        # pode ter várias "cópias" em uma cena, cada uma com seu
+        # posicionamento e órbita.
+        objects:
+                -
+                        # Os elementos são referenciados pelo nome
+                        element: Begin
+                        # Posição inicial do objeto
+                        pos: [0,0,0]
+           
+                        # Velocidades de rotação nos 3 eixos (graus / segundo)
+                        rotation_velocity: [30,30,0]
+
+                        # Não tem movimento
+                        movement:
+                                type: static
+
+                -
+                        # Precisa desse id para referenciar quando for criar órbita, ali embaixo
+                        id: 1
+                        element: Jupiter
+                        pos: [500,500,500]
+
+                        rotation_velocity: [45,0,0]
+
+                        moviment:
+                                type: static
+
+
+                        element: Io
+                        rotation_velocity: [10,10,0]
+
+                        moviment:
+                                type: orbit
+                                # Id do objeto central da órbita
+                                center_planet_id: 1
+                                # Vetor com a direção do raio maior
+                                max_radius_direction: [1,0,0]
+                                # Vetor com a direção do raio menor
+                                min_radius_direction: [0,1,0]
+
+
+        stars:
+                # Número de estrelas aleatórias para serem desenhadas no background
+                num: 200
