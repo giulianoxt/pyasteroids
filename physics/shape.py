@@ -1,5 +1,8 @@
 from physics.vector3d import Vector3d
 
+#  Apenas os módulos das forças de resistência precisam ser informados, pois esses valors serão somandos
+#  e valor dessa soma será multiplicado pelo vetor unitário, mas com sentido inverso, resultante da soma vetorial dos outros dois tipos de vetores 
+
 class Shape:
 	
 	# m : mass
