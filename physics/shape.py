@@ -39,7 +39,7 @@ class Shape:
 		self.aceleration = self.aceleration + self.aceleration.normalizing().scalar(-f_res)
 		self.aceleration = self.aceleration.scalar(1/self.mass) 
 		
-	def calculate_velocity(self):
+	def calculate_velocity(self, delta):
 		# v = v0 + a.DELTA
 		# DELTA is update ratio
-		self.velocity = self.velocity + self.aceleration
+		self.velocity = self.velocity + self.aceleration*delta
