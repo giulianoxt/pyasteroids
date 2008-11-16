@@ -5,6 +5,7 @@ class Shape:
 	mass = 0.0
 	velocity = Vector3d(0., 0., 0.)
 	aceleration = Vector3d(0., 0., 0.)
+	position = Vector3d(0., 0., 0.)
 	
 	# forces
 	# vector list
@@ -42,4 +43,7 @@ class Shape:
 	def calculate_velocity(self, delta):
 		# v = v0 + a.DELTA
 		# DELTA is update ratio
-		self.velocity = self.velocity + self.aceleration*delta
+		self.velocity = self.velocity + self.aceleration.scalar(delta)
+		
+	def calculate_position(self, delta):
+		self.position = self.position + self.velocity.scalar(delta)
