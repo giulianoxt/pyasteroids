@@ -2,24 +2,22 @@ from physics.vector3d import Vector3d
 
 class Shape:
 	
-	mass = 0.0
-	velocity = Vector3d(0., 0., 0.)
-	aceleration = Vector3d(0., 0., 0.)
-	position = Vector3d(0., 0., 0.)
-	
-	# forces
-	# vector list
-	forces = []
-	# temporary force or impulse
-	# vector list
-	forces_tmp = []
-	# resistence force
-	# positive real values list 
-	forces_res = []
-	
 	# m : mass
-	def __init__(self, m):
+	def __init__(self, m = 0.0, pos = Vector3d(0.,0.,0.)):
 		self.mass = m
+		self.position = pos
+		self.velocity = Vector3d(0., 0., 0.)
+		self.aceleration = Vector3d(0., 0., 0.)
+	
+		# forces
+		# vector list
+		self.forces = []
+		# temporary force or impulse
+		# vector list
+		self.forces_tmp = []
+		# resistence force
+		# positive real values list 
+		self.forces_res = []
 	
 	def calculate_aceleration(self):
 
@@ -30,7 +28,7 @@ class Shape:
 			self.aceleration = self.aceleration + f
 			
 		# clear temporary forces
-		forces_tmp = []
+		self.forces_tmp = []
 		
 		f_res = 0.0
 		
