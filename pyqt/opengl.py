@@ -74,7 +74,7 @@ class GLController(QGLWidget):
         # TODO: remover isso abaixo. Soh pra testes
         
         self.test_model = GLModel(open(
-            'resources/models/planets/io.ply')
+            'resources/models/long-spaceship/long-spaceship.ply')
         )
         self.test_model.x_r = 0
         self.test_model.y_r = 0
