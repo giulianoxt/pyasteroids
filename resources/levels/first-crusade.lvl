@@ -37,6 +37,7 @@ elements:
                 # Informações do shape do elemento (utilizado para detecção de colisão)
                 shape:
                         type: bounding_sphere
+                        mass: 300
 
         -
                 name: Jupiter
@@ -54,7 +55,7 @@ elements:
                 shape:
                         # Bounding sphere (BS), axis-aligned-bounding-box (AABB) ou oriented-bounding-box (OBB)
                         type: bounding_sphere
-
+                        mass: 50
         -
                 name: Begin
                 subtitle: Start portal
@@ -69,6 +70,7 @@ elements:
 
                 shape:
                         type: bounding_box
+                        mass: 50
 
 
 scene:

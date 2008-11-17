@@ -3,10 +3,11 @@ import random
 from sys import argv
 from PyQt4.QtGui import QApplication
 
-from pyqt.main_window import AsteroidsMainWindow
 from util.config import ConfigManager
+from pyqt.main_window import AsteroidsMainWindow
 
-def setup_modules():
+
+def start_pyasteroids():
     random.seed()
     
     # Faster processing
@@ -21,21 +22,19 @@ def setup_modules():
     # Load the config files in memory
     ConfigManager()
 
+    app = QApplication(argv)
+
     # Creates the window (GLWidget is created there)
     win = AsteroidsMainWindow() 
 
     # Pop-up the window
     win.show()
 
-def start_pyasteroids(a):
-    # Gives control to Qt
-    a.exec_()
+    # Gives control to QT
+    app.exec_()
 
 
 if __name__ == '__main__':
     print '# PyAsteroids3D #\n'
     
-    app = QApplication(argv)
-    
-    setup_modules()
-    start_pyasteroids(app)
+    start_pyasteroids()

@@ -7,38 +7,31 @@ from PyQt4 import QtCore
 from PyQt4.QtOpenGL import QGLWidget
 from PyQt4.QtCore import Qt, QTimer, QObject
 
+import screens
 from util.config import Config
 
-from model.opengl import GLModel
 
 class GLController(QGLWidget):
-    instance = None
-    
-    @classmethod
-    def getInstance(cls):
-        return GLController.instance
-    
     def __init__(self, parent):
         QGLWidget.__init__(self, parent)
-        
-        if (GLController.instance is None):
-            GLController.instance = self
-        
-        self.parent = parent
         
         cfg = Config('game','OpenGL')
         
         self.fps = cfg.get('fps')
         self.clearColor = cfg.get('clear_color')
-               
-        self.adjustWidget()
-        self.adjustTimer()
+        
+        self.screen_stack = []
+        first_screen = Config('game','Screens').get('first_screen')
+        self.push_screen(first_screen)
+        
+        self.adjust_widget()
+        self.adjust_timer()
     
-    def adjustWidget(self):
+    def adjust_widget(self):
         self.setAttribute(Qt.WA_KeyCompression,False)
         self.setMouseTracking(True)
     
-    def adjustTimer(self):
+    def adjust_timer(self):
         self.timer = QTimer(self)
         QObject.connect(self.timer, QtCore.SIGNAL('timeout()'), self.tick)
         self.last_time = time()
@@ -67,27 +60,7 @@ class GLController(QGLWidget):
         # Enable transparency by alpha value
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
                 
-        glClearColor(*map(lambda c : c / 255.0, self.clearColor))
-        
-        
-        
-        # TODO: remover isso abaixo. Soh pra testes
-        
-        self.test_model = GLModel(open(
-            'resources/models/long-spaceship/long-spaceship.ply')
-        )
-        self.test_model.x_r = 0
-        self.test_model.y_r = 0
-        self.test_model.z_r = 0
-        
-        glEnable(GL_LIGHTING)
-        
-        glMaterialfv(GL_FRONT, GL_AMBIENT, (.5,.5,.5,1.))
-        glLightfv(GL_LIGHT0, GL_AMBIENT, (.9,.9,.9,.8))
-        glLightfv(GL_LIGHT0, GL_POSITION, (0.,500.,10000.,1.))
-
-        glEnable(GL_LIGHT0) 
-        
+        glClearColor(*map(lambda c : c / 255.0, self.clearColor)) 
 
     def resizeGL(self, width, height):
         QGLWidget.resizeGL(self,width,height)
@@ -105,10 +78,6 @@ class GLController(QGLWidget):
         
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
-        
-        
-        # TODO: CAMERA PROVISORIA! fazer uma classe Camera
-        gluLookAt(0.,0.,50.,0.,0.,-1.,0.,1.,0.)
 
     def paintGL(self):
         glMatrixMode(GL_MODELVIEW)
@@ -116,15 +85,7 @@ class GLController(QGLWidget):
         
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         
-        
-        # TODO: esquema de drawing. Isso aqui eh soh pra teste
-        glScalef(10.,10.,10.)
-              
-        glRotatef(self.test_model.x_r,1.,0.,0.)
-        glRotatef(self.test_model.y_r,0.,1.,0.)
-        glRotatef(self.test_model.z_r,0.,0.,1.)
-        
-        self.test_model.draw()
+        self.screen_stack[-1].draw()
         
         glPopMatrix()
     
@@ -135,30 +96,48 @@ class GLController(QGLWidget):
         
         self.fps = 1 / elapsed
         
-        #print 'fps = ', int(self.fps)
-        
-        
-        #TODO: atualizar o estado dos objetos aqui
-        self.test_model.x_r += 0.2
-        self.test_model.z_r += 0.1
-        self.test_model.y_r += 0.2
+        self.screen_stack[-1].tick(elapsed)
         
         self.updateGL()
-    
-    def keyPressEvent(self, keyEvent):
-        pass
-    
-    def keyReleaseEvent(self, keyEvent):
-        pass
 
-    def mouseMoveEvent(self, mouseEvent):
-        pass
-    
-    def mousePressEvent(self, mouseEvent):
-        pass
-    
-    def mouseReleaseEvent(self, mouseEvent):
-        pass
+    # dynamic dispatch of qt events to screens
+    def __getattr__(self, attr):
+        # if its an event (keyPressEvent, mousePressEvent, etc..)
+        if (attr.endswith('Event')):
+            # let the top screen handle it
+            return getattr(self.screen_stack[-1], attr)
+        else:
+            raise AttributeError
 
-    def contextMenuEvent(self, contextEvent):
-        pass
+    def pop_screen(self, screen):
+        # erases that screen and all above it
+        i = self.screen_stack.index(screen)
+        del self.screen_stack[i:]
+        
+        # if we run out of screens, the game is over
+        if (not len(self.screen_stack)):
+            self.parent().parent().close()
+
+    def push_screen(self, new_screen_name, *args, **kwargs):       
+        NewScreenCls = None
+        
+        # the new screen class can be in the screens module
+        # or in a submodule on that directory
+    
+        submodules = [getattr(screens, m) for m in dir(screens)]
+        modules = submodules + [screens] 
+        
+        for mod in modules:
+            if (hasattr(mod, new_screen_name)):
+                NewScreenCls = getattr(mod, new_screen_name)
+                break
+        
+        # create a new screen instance using the arguments
+        # sent by the previous screen
+        new_screen = NewScreenCls(*args, **kwargs)
+        
+        # include a reference to this controller
+        new_screen.controller = self
+        
+        # finally, push it
+        self.screen_stack.append(new_screen)
