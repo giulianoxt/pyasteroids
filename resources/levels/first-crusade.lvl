@@ -24,7 +24,9 @@ elements:
                         # Caminho para o modelo deste elemento (partindo de resources/models)
                         file: planets/io.ply
                         # Aplica esse scale antes de desenhar [opcional]
-                        scale: 10
+                        scale: 1
+                        rotate: [0,0,0]
+                        translate: [0,0,0]
 
                 # Indica se os tiros afetam esse elemento
                 destructible: yes
@@ -46,6 +48,9 @@ elements:
 
                 model:
                         file: planets/neptune.ply
+                        scale: 1
+                        rotate: [0,0,0]
+                        translate: [0,0,0]                        
 
                 destructible: no
 
@@ -63,6 +68,26 @@ elements:
 
                 model:
                         file: planets/io.ply
+                        scale: 2
+                        rotate: [0,0,0]
+                        translate: [0,0,0]                        
+
+                destroys_player: no
+
+                shape:
+                        type: bounding_box
+
+        -
+                name: Gunboat
+                subtitle: Test ship
+
+                type: ship
+
+                model:
+                        file: gunboat/gunboat.ply
+                        scale: 0.02
+                        rotate: [0,0,0]
+                        translate: [0,0,0]                        
 
                 destroys_player: no
 
@@ -88,7 +113,7 @@ scene:
                         pos: [0,0,-20]
            
                         # Velocidades de rotação nos 3 eixos (graus / segundo)
-                        rotation_velocity: [360,100,100]
+                        rotation_velocity: [0,100,0]
 
                         # Não tem movimento
                         movement:
@@ -102,7 +127,7 @@ scene:
                         element: Neptune
                         pos: [7,7,-20]
 
-                        rotation_velocity: [0,180,0]
+                        rotation_velocity: [300,0,0]
 
                         movement:
                                 type: static
@@ -122,6 +147,18 @@ scene:
                                 # Vetor com a direção do raio menor
                                 min_radius_direction: [0,1,0]
 
+                        mass: 50
+                        
+                -
+                        element: Gunboat
+                        
+                        pos: [-20,0,-40]
+
+                        rotation_velocity: [40,50,20]
+
+                        movement:
+                                type: static
+                                
                         mass: 50
 
 

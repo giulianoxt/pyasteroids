@@ -20,12 +20,24 @@ class Level(object):
     def load_file(self, level_name):
         lvl = yaml.load(open('resources/levels/' + level_name + '.lvl'))
 
+        self.title = lvl['name']
+        self.dimensions = lvl['scene']['dimensions']
+
         models = {}
 
         for element in lvl['elements']:
             file = open('resources/models/'+element['model']['file'], 'r')
             
-            models[element['name']] = GLModel(file)
+            name = element['name']
+            subtitle = element['subtitle']
+            
+            translate = element['model']['translate']
+            rotate = element['model']['rotate']
+            scale = element['model']['scale']
+            
+            models[element['name']] = GLModel(
+                file, name, subtitle, translate, rotate, scale
+            )
             
             file.close()
         

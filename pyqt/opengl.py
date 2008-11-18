@@ -99,6 +99,8 @@ class GLController(QGLWidget):
         
         self.fps = 1 / elapsed
         
+        print 'fps =', self.fps
+        
         # if we run out of screens, the game is over
         if (not len(self.screen_stack)):
             self.parent().close()

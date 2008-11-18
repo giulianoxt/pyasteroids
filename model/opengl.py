@@ -12,12 +12,15 @@ from model.ply import PLYModel
 
 
 class GLModel(object):
-    def __init__(self, file):
+    def __init__(self, file, name, subtitle,
+            translate = (0.,0.,0.), rotate = (0.,0.,0.), scale = 0.):
         self.ply = PLYModel(file)
         
-        self.setup_dl = None
-        self.main_dl = None
+        self.name = name
+        self.subtitle = subtitle
+        
         self.textures = None
+        self.dlist = None
         
         if (not 'vertex' in self.ply or not 'face' in self.ply):
             raise Exception('Invalid PLY model')
@@ -25,7 +28,7 @@ class GLModel(object):
         if ('material' in self.ply and 'material_index' in self.ply['face'][0]):
             self.generate_textures()      
     
-        self.generate_display_list()
+        self.make_display_list(translate, rotate, scale)
     
     def generate_textures(self):
         num_text = len(self.ply['material'])
@@ -33,7 +36,9 @@ class GLModel(object):
         self.textures = glGenTextures(num_text)
         
         if (num_text == 1):
-            self.textures = (self.textures,)
+            self.textures = [self.textures]
+        else:
+            self.textures = list(self.textures)
         
         for i in xrange(num_text):
             text_id = self.textures[i]
@@ -41,6 +46,7 @@ class GLModel(object):
             
             if (not len(text_path)):
                 self.textures[i] = None
+                continue
 
             glBindTexture(GL_TEXTURE_2D, text_id)
 
@@ -57,24 +63,30 @@ class GLModel(object):
             
         if (not any(self.textures)):
             self.textures = None           
-    
-    def generate_display_list(self):
-        self.main_dl = glGenLists(1)
-        glNewList(self.main_dl, GL_COMPILE)
+       
+    def make_display_list(self, translate, rotate, scale):
+        self.dlist = glGenLists(1)
+        glNewList(self.dlist, GL_COMPILE)
+        
+        glTranslate(*translate)
+        
+        for ((x,y,z),a) in zip(((1.,0.,0.), (0.,1.,0.), (0.,0.,1.)), rotate):
+            glRotatef(a,x,y,z)
+        
+        glScalef(*([scale]*3))
+        
         self.direct_draw()
+        
         glEndList()
         
         del self.ply
 
     def __del__(self):
-        if (self.textures):
+        if (hasattr(self,'textures') and self.textures):
             glDeleteTextures(self.textures)
         
-        if (self.setup_dl):
-            glDeleteLists(self.setup_dl, 1)
-        
-        if (self.main_dl):
-            glDeleteLists(self.main_dl, 1)
+        if (self.dlist):
+            glDeleteLists(self.dlist, 1)
 
     def direct_draw(self):
         faces = self.ply['face']
@@ -114,10 +126,7 @@ class GLModel(object):
         glMatrixMode(GL_MODELVIEW)
         glPushMatrix()
         
-        if (self.setup_dl is not None):
-            glCallList(self.setup_dl)
-        
-        glCallList(self.main_dl)
+        glCallList(self.dlist)
         
         glPopMatrix()
     
