@@ -84,7 +84,7 @@ elements:
                 type: ship
 
                 model:
-                        file: gunboat/gunboat.ply
+                        file: gunboat/gunboat2.ply
                         scale: 0.02
                         rotate: [0,0,0]
                         translate: [0,0,0]                        
