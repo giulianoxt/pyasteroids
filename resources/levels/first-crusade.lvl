@@ -39,13 +39,13 @@ elements:
                         type: bounding_sphere
 
         -
-                name: Jupiter
+                name: Neptune
                 subtitle: Gas giant
 
                 type: planet
 
                 model:
-                        file: planets/io.ply
+                        file: planets/neptune.ply
 
                 destructible: no
 
@@ -99,8 +99,8 @@ scene:
                 -
                         # Precisa desse id para referenciar quando for criar órbita, ali embaixo
                         id: 1
-                        element: Jupiter
-                        pos: [10,10,-20]
+                        element: Neptune
+                        pos: [7,7,-20]
 
                         rotation_velocity: [0,180,0]
 

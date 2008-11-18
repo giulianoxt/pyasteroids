@@ -1,29 +1,36 @@
 import yaml
 
-from physics.shape import Shape
-from physics.vector3d import Vector3d
-from model.opengl import GLModel
-
 from OpenGL.GL import *
+
+from util.config import Config
+from physics.shape import Shape
+from model.opengl import GLModel
+from physics.vector3d import Vector3d
 
 
 class Level(object):
-    def __init__(self, levelName):
-        lvl = yaml.load(open('resources/levels/' + levelName + '.lvl'))
+    def __init__(self, level_number):
+        self.number = level_number
+        self.objects = []
         
-        self.models = {}
+        level_name = Config('levels','Levels').get(str(level_number))
+        
+        self.load_file(level_name)
+    
+    def load_file(self, level_name):
+        lvl = yaml.load(open('resources/levels/' + level_name + '.lvl'))
+
+        models = {}
 
         for element in lvl['elements']:
             file = open('resources/models/'+element['model']['file'], 'r')
             
-            self.models[element['name']] = GLModel(file)
+            models[element['name']] = GLModel(file)
             
             file.close()
         
-        self.objects = []
-        
         for object in lvl['scene']['objects']:
-            model = self.models[object['element']]
+            model = models[object['element']]
             mass = float(object['mass'])
             
             rvel = object['rotation_velocity']

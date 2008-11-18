@@ -1,5 +1,4 @@
 import os
-from sys import exc_info
 from time import time
 
 from OpenGL.GL import *
@@ -15,18 +14,15 @@ from util.config import Config
 
 class GLController(QGLWidget):
     def __init__(self, parent):
-        try:
-            QGLWidget.__init__(self, parent)
+        QGLWidget.__init__(self, parent)
         
-            cfg = Config('game','OpenGL')
+        cfg = Config('game','OpenGL')
         
-            self.fps = cfg.get('fps')
-            self.clearColor = cfg.get('clear_color')
+        self.fps = cfg.get('fps')
+        self.clearColor = cfg.get('clear_color')
         
-            self.adjust_widget()
-            self.adjust_timer()
-        except:
-            print 'excecao controller init!, exc = ', exc_info()[1]
+        self.adjust_widget()
+        self.adjust_timer()
     
     def adjust_widget(self):
         self.setAttribute(Qt.WA_KeyCompression,False)
@@ -82,19 +78,19 @@ class GLController(QGLWidget):
         z_near = cfg.get('z_near')
         z_far = cfg.get('z_far')
         gluPerspective(fovy,float(width)/height,z_near,z_far)
-        
-        #glMatrixMode(GL_MODELVIEW)
-        #glLoadIdentity()
 
     def paintGL(self):
         glMatrixMode(GL_MODELVIEW)
-        glPushMatrix()
+        glLoadIdentity()
         
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         
-        self.screen_stack[-1].draw()
+        # if we run out of screens, the game is over
+        if (not len(self.screen_stack)):
+            self.parent().close()
+            return
         
-        glPopMatrix()
+        self.screen_stack[-1].draw()
     
     def tick(self):
         new_time = time()
@@ -102,6 +98,11 @@ class GLController(QGLWidget):
         self.last_time = new_time
         
         self.fps = 1 / elapsed
+        
+        # if we run out of screens, the game is over
+        if (not len(self.screen_stack)):
+            self.parent().close()
+            return
         
         self.screen_stack[-1].tick(elapsed)
         
@@ -120,10 +121,6 @@ class GLController(QGLWidget):
         # erases that screen and all above it
         i = self.screen_stack.index(screen)
         del self.screen_stack[i:]
-        
-        # if we run out of screens, the game is over
-        if (not len(self.screen_stack)):
-            self.parent().parent().close()
 
     def push_screen(self, new_screen_name, *args, **kwargs):   
         NewScreenCls = None

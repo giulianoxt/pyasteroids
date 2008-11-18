@@ -9,4 +9,5 @@ class Intro(object):
         pass
     
     def tick(self, time_elapsed):
-        self.controller.push_screen('Level','first-crusade')
+        self.controller.pop_screen(self)
+        self.controller.push_screen('Level', 1)
