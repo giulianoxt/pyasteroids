@@ -37,7 +37,6 @@ elements:
                 # Informações do shape do elemento (utilizado para detecção de colisão)
                 shape:
                         type: bounding_sphere
-                        mass: 300
 
         -
                 name: Jupiter
@@ -46,7 +45,7 @@ elements:
                 type: planet
 
                 model:
-                        file: planets/jupiter.ply
+                        file: planets/io.ply
 
                 destructible: no
 
@@ -55,7 +54,6 @@ elements:
                 shape:
                         # Bounding sphere (BS), axis-aligned-bounding-box (AABB) ou oriented-bounding-box (OBB)
                         type: bounding_sphere
-                        mass: 50
         -
                 name: Begin
                 subtitle: Start portal
@@ -64,13 +62,12 @@ elements:
                 type: start_portal
 
                 model:
-                        file: portals/basic-portal.ply
+                        file: planets/io.ply
 
                 destroys_player: no
 
                 shape:
                         type: bounding_box
-                        mass: 50
 
 
 scene:
@@ -88,31 +85,35 @@ scene:
                         # Os elementos são referenciados pelo nome
                         element: Begin
                         # Posição inicial do objeto
-                        pos: [0,0,0]
+                        pos: [0,0,-20]
            
                         # Velocidades de rotação nos 3 eixos (graus / segundo)
-                        rotation_velocity: [30,30,0]
+                        rotation_velocity: [360,100,100]
 
                         # Não tem movimento
                         movement:
                                 type: static
+                                
+                        mass: 300
 
                 -
                         # Precisa desse id para referenciar quando for criar órbita, ali embaixo
                         id: 1
                         element: Jupiter
-                        pos: [500,500,500]
+                        pos: [10,10,-20]
 
-                        rotation_velocity: [45,0,0]
+                        rotation_velocity: [0,180,0]
 
-                        moviment:
+                        movement:
                                 type: static
+                                
+                        mass: 50
 
-
+                -
                         element: Io
-                        rotation_velocity: [10,10,0]
+                        rotation_velocity: [180,180,180]
 
-                        moviment:
+                        movement:
                                 type: orbit
                                 # Id do objeto central da órbita
                                 center_planet_id: 1
@@ -120,6 +121,8 @@ scene:
                                 max_radius_direction: [1,0,0]
                                 # Vetor com a direção do raio menor
                                 min_radius_direction: [0,1,0]
+
+                        mass: 50
 
 
         stars:

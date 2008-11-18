@@ -1,4 +1,5 @@
 import os
+from sys import exc_info
 from time import time
 
 from OpenGL.GL import *
@@ -14,19 +15,18 @@ from util.config import Config
 
 class GLController(QGLWidget):
     def __init__(self, parent):
-        QGLWidget.__init__(self, parent)
+        try:
+            QGLWidget.__init__(self, parent)
         
-        cfg = Config('game','OpenGL')
+            cfg = Config('game','OpenGL')
         
-        self.fps = cfg.get('fps')
-        self.clearColor = cfg.get('clear_color')
+            self.fps = cfg.get('fps')
+            self.clearColor = cfg.get('clear_color')
         
-        self.screen_stack = []
-        first_screen = Config('game','Screens').get('first_screen')
-        self.push_screen(first_screen)
-        
-        self.adjust_widget()
-        self.adjust_timer()
+            self.adjust_widget()
+            self.adjust_timer()
+        except:
+            print 'excecao controller init!, exc = ', exc_info()[1]
     
     def adjust_widget(self):
         self.setAttribute(Qt.WA_KeyCompression,False)
@@ -62,6 +62,12 @@ class GLController(QGLWidget):
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
                 
         glClearColor(*map(lambda c : c / 255.0, self.clearColor)) 
+        
+        self.screen_stack = []
+            
+        first_screen = Config('game','Screens').get('first_screen')
+           
+        self.push_screen(first_screen)
 
     def resizeGL(self, width, height):
         QGLWidget.resizeGL(self,width,height)
@@ -77,8 +83,8 @@ class GLController(QGLWidget):
         z_far = cfg.get('z_far')
         gluPerspective(fovy,float(width)/height,z_near,z_far)
         
-        glMatrixMode(GL_MODELVIEW)
-        glLoadIdentity()
+        #glMatrixMode(GL_MODELVIEW)
+        #glLoadIdentity()
 
     def paintGL(self):
         glMatrixMode(GL_MODELVIEW)
@@ -119,7 +125,7 @@ class GLController(QGLWidget):
         if (not len(self.screen_stack)):
             self.parent().parent().close()
 
-    def push_screen(self, new_screen_name, *args, **kwargs):       
+    def push_screen(self, new_screen_name, *args, **kwargs):   
         NewScreenCls = None
         
         # the new screen class can be in the screens module
@@ -130,19 +136,19 @@ class GLController(QGLWidget):
         for f in os.listdir('screens'):
             # remove extension
             f = f[0:f.rfind('.')]
+            
             try:
                 m = __import__('screens.'+f, fromlist=[f])
                 submodules.append(m)
             except:
                 pass
-        
-        modules = submodules + [screens] 
+                
+        modules = submodules + [screens]
         
         for mod in modules:
             if (hasattr(mod, new_screen_name)):
                 NewScreenCls = getattr(mod, new_screen_name)
                 break
-            
         
         # create a new screen instance using the arguments
         # sent by the previous screen

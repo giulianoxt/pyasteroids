@@ -1,17 +1,21 @@
-from physics.vector3d import Vector3d
-
-#  Apenas os módulos das forças de resistência precisam ser informados, pois esses valors serão somandos
-#  e valor dessa soma será multiplicado pelo vetor unitário, mas com sentido inverso, resultante da soma vetorial dos outros dois tipos de vetores 
+from physics.vector3d import Vector3d 
 
 class Shape:
 	
 	# m : mass
-	def __init__(self, m = 0.0, pos = Vector3d(0.,0.,0.)):
+	def __init__(self, model, m = 0.0, pos = Vector3d(0.,0.,0.)):
 		self.mass = m
 		self.position = pos
 		self.velocity = Vector3d(0., 0., 0.)
 		self.aceleration = Vector3d(0., 0., 0.)
-	
+		# angular velocity ( degree/sec )
+		self.velocity_angular_x = 0.0
+		self.velocity_angular_y = 0.0
+		self.velocity_angular_z = 0.0
+		# angles ( degree )
+		self.angle_x = 0.0 
+		self.angle_y = 0.0
+		self.angle_z = 0.0
 		# forces
 		# vector list
 		self.forces = []
@@ -21,6 +25,8 @@ class Shape:
 		# resistence force
 		# positive real values list 
 		self.forces_res = []
+
+		self.model = model
 	
 	def calculate_aceleration(self):
 
@@ -48,3 +54,14 @@ class Shape:
 		
 	def calculate_position(self, delta):
 		self.position = self.position + self.velocity.scalar(delta)
+
+	def calculate_angle(self, delta):
+		self.angle_x = self.angle_x + self.velocity_angular_x*delta
+		self.angle_y = self.angle_y + self.velocity_angular_y*delta
+		self.angle_z = self.angle_z + self.velocity_angular_z*delta
+		
+
+	def update(self, delta):
+		self.calculate_velocity(delta)
+		self.calculate_position(delta)
+		self.calculate_angle(delta)

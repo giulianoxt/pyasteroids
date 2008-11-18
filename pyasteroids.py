@@ -38,3 +38,4 @@ if __name__ == '__main__':
     print '# PyAsteroids3D #\n'
     
     start_pyasteroids()
+    
