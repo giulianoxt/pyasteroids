@@ -1,3 +1,4 @@
+import os
 from time import time
 
 from OpenGL.GL import *
@@ -123,14 +124,25 @@ class GLController(QGLWidget):
         
         # the new screen class can be in the screens module
         # or in a submodule on that directory
-    
-        submodules = [getattr(screens, m) for m in dir(screens)]
+               
+        submodules = []
+        
+        for f in os.listdir('screens'):
+            # remove extension
+            f = f[0:f.rfind('.')]
+            try:
+                m = __import__('screens.'+f, fromlist=[f])
+                submodules.append(m)
+            except:
+                pass
+        
         modules = submodules + [screens] 
         
         for mod in modules:
             if (hasattr(mod, new_screen_name)):
                 NewScreenCls = getattr(mod, new_screen_name)
                 break
+            
         
         # create a new screen instance using the arguments
         # sent by the previous screen
