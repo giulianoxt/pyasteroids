@@ -1,0 +1,611 @@
+<ui version="4.0" >
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1046</width>
+    <height>637</height>
+   </rect>
+  </property>
+  <property name="minimumSize" >
+   <size>
+    <width>1046</width>
+    <height>637</height>
+   </size>
+  </property>
+  <property name="maximumSize" >
+   <size>
+    <width>1046</width>
+    <height>637</height>
+   </size>
+  </property>
+  <property name="windowTitle" >
+   <string>Level Editor - PyAsteroids 3D</string>
+  </property>
+  <widget class="QWidget" name="centralwidget" >
+   <widget class="QGroupBox" name="groupBox" >
+    <property name="enabled" >
+     <bool>true</bool>
+    </property>
+    <property name="geometry" >
+     <rect>
+      <x>10</x>
+      <y>0</y>
+      <width>171</width>
+      <height>261</height>
+     </rect>
+    </property>
+    <property name="title" >
+     <string>Scene</string>
+    </property>
+    <widget class="QLabel" name="label_3" >
+     <property name="geometry" >
+      <rect>
+       <x>11</x>
+       <y>88</y>
+       <width>35</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text" >
+      <string>Stars:</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="lineEdit" >
+     <property name="geometry" >
+      <rect>
+       <x>53</x>
+       <y>31</y>
+       <width>107</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text" >
+      <string>Untitled</string>
+     </property>
+    </widget>
+    <widget class="QSpinBox" name="spinBox" >
+     <property name="geometry" >
+      <rect>
+       <x>53</x>
+       <y>88</y>
+       <width>107</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="maximum" >
+      <number>500</number>
+     </property>
+     <property name="singleStep" >
+      <number>10</number>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_4" >
+     <property name="geometry" >
+      <rect>
+       <x>11</x>
+       <y>116</y>
+       <width>36</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text" >
+      <string>Zoom:</string>
+     </property>
+    </widget>
+    <widget class="QSlider" name="horizontalSlider" >
+     <property name="geometry" >
+      <rect>
+       <x>53</x>
+       <y>116</y>
+       <width>107</width>
+       <height>24</height>
+      </rect>
+     </property>
+     <property name="maximum" >
+      <number>1000</number>
+     </property>
+     <property name="orientation" >
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="invertedAppearance" >
+      <bool>false</bool>
+     </property>
+     <property name="invertedControls" >
+      <bool>false</bool>
+     </property>
+    </widget>
+    <widget class="QSpinBox" name="spinBox_2" >
+     <property name="geometry" >
+      <rect>
+       <x>53</x>
+       <y>59</y>
+       <width>107</width>
+       <height>24</height>
+      </rect>
+     </property>
+     <property name="maximum" >
+      <number>10000</number>
+     </property>
+     <property name="singleStep" >
+      <number>100</number>
+     </property>
+     <property name="value" >
+      <number>2000</number>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label" >
+     <property name="geometry" >
+      <rect>
+       <x>11</x>
+       <y>31</y>
+       <width>38</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text" >
+      <string>Name:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_2" >
+     <property name="geometry" >
+      <rect>
+       <x>11</x>
+       <y>59</y>
+       <width>30</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text" >
+      <string>Size:</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_2" >
+     <property name="geometry" >
+      <rect>
+       <x>113</x>
+       <y>181</y>
+       <width>47</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <property name="text" >
+      <string>Right</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_3" >
+     <property name="geometry" >
+      <rect>
+       <x>62</x>
+       <y>146</y>
+       <width>47</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <property name="text" >
+      <string>Up</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_4" >
+     <property name="geometry" >
+      <rect>
+       <x>11</x>
+       <y>181</y>
+       <width>47</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <property name="text" >
+      <string>Left</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_5" >
+     <property name="geometry" >
+      <rect>
+       <x>62</x>
+       <y>216</y>
+       <width>47</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <property name="text" >
+      <string>Down</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_5" >
+     <property name="geometry" >
+      <rect>
+       <x>62</x>
+       <y>181</y>
+       <width>47</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <property name="text" >
+      <string>Spin</string>
+     </property>
+     <property name="alignment" >
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_2" >
+    <property name="geometry" >
+     <rect>
+      <x>10</x>
+      <y>260</y>
+      <width>171</width>
+      <height>321</height>
+     </rect>
+    </property>
+    <property name="title" >
+     <string>Object</string>
+    </property>
+    <widget class="QSpinBox" name="spinBox_8" >
+     <property name="geometry" >
+      <rect>
+       <x>87</x>
+       <y>175</y>
+       <width>81</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <property name="singleStep" >
+      <number>10</number>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_6" >
+     <property name="geometry" >
+      <rect>
+       <x>11</x>
+       <y>29</y>
+       <width>51</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text" >
+      <string>Position:</string>
+     </property>
+    </widget>
+    <widget class="QSpinBox" name="spinBox_3" >
+     <property name="geometry" >
+      <rect>
+       <x>87</x>
+       <y>29</y>
+       <width>81</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <property name="maximum" >
+      <number>10000</number>
+     </property>
+     <property name="singleStep" >
+      <number>10</number>
+     </property>
+    </widget>
+    <widget class="QSpinBox" name="spinBox_4" >
+     <property name="geometry" >
+      <rect>
+       <x>87</x>
+       <y>58</y>
+       <width>81</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <property name="maximum" >
+      <number>10000</number>
+     </property>
+     <property name="singleStep" >
+      <number>10</number>
+     </property>
+    </widget>
+    <widget class="QSpinBox" name="spinBox_5" >
+     <property name="geometry" >
+      <rect>
+       <x>87</x>
+       <y>87</y>
+       <width>81</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <property name="singleStep" >
+      <number>10</number>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_7" >
+     <property name="geometry" >
+      <rect>
+       <x>11</x>
+       <y>116</y>
+       <width>71</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text" >
+      <string>Rotation vel:</string>
+     </property>
+    </widget>
+    <widget class="QSpinBox" name="spinBox_6" >
+     <property name="geometry" >
+      <rect>
+       <x>87</x>
+       <y>116</y>
+       <width>81</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <property name="singleStep" >
+      <number>10</number>
+     </property>
+    </widget>
+    <widget class="QSpinBox" name="spinBox_7" >
+     <property name="geometry" >
+      <rect>
+       <x>87</x>
+       <y>145</y>
+       <width>81</width>
+       <height>27</height>
+      </rect>
+     </property>
+     <property name="singleStep" >
+      <number>10</number>
+     </property>
+    </widget>
+    <widget class="QSpinBox" name="spinBox_9" >
+     <property name="geometry" >
+      <rect>
+       <x>87</x>
+       <y>204</y>
+       <width>81</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <property name="maximum" >
+      <number>10000</number>
+     </property>
+     <property name="singleStep" >
+      <number>10</number>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="comboBox" >
+     <property name="geometry" >
+      <rect>
+       <x>87</x>
+       <y>233</y>
+       <width>81</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <item>
+      <property name="text" >
+       <string>static</string>
+      </property>
+     </item>
+     <item>
+      <property name="text" >
+       <string>orbit</string>
+      </property>
+     </item>
+    </widget>
+    <widget class="QLabel" name="label_11" >
+     <property name="enabled" >
+      <bool>false</bool>
+     </property>
+     <property name="geometry" >
+      <rect>
+       <x>11</x>
+       <y>291</y>
+       <width>71</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text" >
+      <string>Orbit radius:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_10" >
+     <property name="enabled" >
+      <bool>false</bool>
+     </property>
+     <property name="geometry" >
+      <rect>
+       <x>11</x>
+       <y>262</y>
+       <width>72</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text" >
+      <string>Orbit center:</string>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="comboBox_2" >
+     <property name="enabled" >
+      <bool>false</bool>
+     </property>
+     <property name="geometry" >
+      <rect>
+       <x>87</x>
+       <y>262</y>
+       <width>81</width>
+       <height>26</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QSpinBox" name="spinBox_10" >
+     <property name="enabled" >
+      <bool>false</bool>
+     </property>
+     <property name="geometry" >
+      <rect>
+       <x>87</x>
+       <y>291</y>
+       <width>81</width>
+       <height>27</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_8" >
+     <property name="geometry" >
+      <rect>
+       <x>11</x>
+       <y>233</y>
+       <width>63</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text" >
+      <string>Movement:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_9" >
+     <property name="geometry" >
+      <rect>
+       <x>11</x>
+       <y>204</y>
+       <width>36</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text" >
+      <string>Mass:</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_3" >
+    <property name="enabled" >
+     <bool>true</bool>
+    </property>
+    <property name="geometry" >
+     <rect>
+      <x>870</x>
+      <y>0</y>
+      <width>171</width>
+      <height>581</height>
+     </rect>
+    </property>
+    <property name="title" >
+     <string>Models</string>
+    </property>
+    <widget class="QListWidget" name="listWidget" >
+     <property name="geometry" >
+      <rect>
+       <x>10</x>
+       <y>30</y>
+       <width>151</width>
+       <height>551</height>
+      </rect>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_4" >
+    <property name="enabled" >
+     <bool>true</bool>
+    </property>
+    <property name="geometry" >
+     <rect>
+      <x>190</x>
+      <y>0</y>
+      <width>671</width>
+      <height>581</height>
+     </rect>
+    </property>
+    <property name="title" >
+     <string>Space</string>
+    </property>
+    <widget class="GLController" native="1" name="widget" >
+     <property name="geometry" >
+      <rect>
+       <x>10</x>
+       <y>30</y>
+       <width>651</width>
+       <height>551</height>
+      </rect>
+     </property>
+     <property name="autoFillBackground" >
+      <bool>false</bool>
+     </property>
+    </widget>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar" >
+   <property name="geometry" >
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1046</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile" >
+    <property name="title" >
+     <string>File</string>
+    </property>
+    <addaction name="actionNew" />
+    <addaction name="actionOpen" />
+    <addaction name="separator" />
+    <addaction name="actionSave" />
+    <addaction name="actionSave_as" />
+    <addaction name="separator" />
+    <addaction name="actionClose" />
+    <addaction name="actionQuit" />
+   </widget>
+   <widget class="QMenu" name="menuHelp" >
+    <property name="title" >
+     <string>Help</string>
+    </property>
+    <addaction name="actionAbout" />
+   </widget>
+   <addaction name="menuFile" />
+   <addaction name="menuHelp" />
+  </widget>
+  <widget class="QStatusBar" name="statusbar" />
+  <action name="actionNew" >
+   <property name="text" >
+    <string>New</string>
+   </property>
+  </action>
+  <action name="actionOpen" >
+   <property name="text" >
+    <string>Open</string>
+   </property>
+  </action>
+  <action name="actionClose" >
+   <property name="text" >
+    <string>Close</string>
+   </property>
+  </action>
+  <action name="actionSave" >
+   <property name="text" >
+    <string>Save</string>
+   </property>
+  </action>
+  <action name="actionSave_as" >
+   <property name="text" >
+    <string>Save as</string>
+   </property>
+  </action>
+  <action name="actionQuit" >
+   <property name="text" >
+    <string>Quit</string>
+   </property>
+  </action>
+  <action name="actionAbout" >
+   <property name="text" >
+    <string>About</string>
+   </property>
+  </action>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>GLController</class>
+   <extends>QWidget</extends>
+   <header>editor.opengl</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
