@@ -11,6 +11,8 @@ from PyQt4 import QtCore, QtGui
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
+        from editor.opengl import GLController
+        
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1046,637)
         MainWindow.setMinimumSize(QtCore.QSize(1046,637))
@@ -224,5 +226,3 @@ class Ui_MainWindow(object):
         self.actionSave_as.setText(QtGui.QApplication.translate("MainWindow", "Save as", None, QtGui.QApplication.UnicodeUTF8))
         self.actionQuit.setText(QtGui.QApplication.translate("MainWindow", "Quit", None, QtGui.QApplication.UnicodeUTF8))
         self.actionAbout.setText(QtGui.QApplication.translate("MainWindow", "About", None, QtGui.QApplication.UnicodeUTF8))
-
-from editor.opengl import GLController

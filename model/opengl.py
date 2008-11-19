@@ -12,7 +12,7 @@ from model.ply import PLYModel
 
 
 class GLModel(object):
-    def __init__(self, file, name, subtitle,
+    def __init__(self, file, name = '', subtitle = '',
             translate = (0.,0.,0.), rotate = (0.,0.,0.), scale = 0.):
         self.ply = PLYModel(file)
         

@@ -10,6 +10,7 @@ from PyQt4.QtCore import Qt, QTimer, QObject
 
 from util.config import Config
 
+from main_window import EditorMainWindow
 
 class GLController(QGLWidget):
     def __init__(self, parent):
@@ -56,7 +57,9 @@ class GLController(QGLWidget):
         # Enable transparency by alpha value
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
                 
-        glClearColor(*map(lambda c : c / 255.0, self.clearColor)) 
+        glClearColor(*map(lambda c : c / 255.0, self.clearColor))
+        
+        EditorMainWindow.instance.with_gl_context()
 
     def resizeGL(self, width, height):
         QGLWidget.resizeGL(self,width,height)
