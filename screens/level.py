@@ -64,16 +64,14 @@ class Level(object):
             movement = object['movement']['type']
 
             if (movement == 'static'):
-                pos = Vector3d(*object['pos'])
-            
-                shape = Shape(mass, pos)
-            
+		pos = Vector3d(*object['pos'])
+                shape = Shape(mass, pos)	       	
                 shape.velocity_angular_x = rvel[0]
                 shape.velocity_angular_y = rvel[1]
                 shape.velocity_angular_z = rvel[2]
             elif (movement == 'orbit'):
-                # TODO: support for orbit movement
-                continue
+                pos = Vector3d(*object['movement']['start_position'])
+		shape = Shape(mass, pos)
                        
             type = element['type']
             

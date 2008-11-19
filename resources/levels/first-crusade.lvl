@@ -37,6 +37,31 @@ elements:
                 destroys_player: yes
 
         -
+                # Título e subtítulo que vão aparecer na interface
+                # quando o jogador mirar nesse elemento com a arma
+                name: Asteroid1
+                subtitle: Asteroid Big-Stick
+
+                # Type indica como o jogo irá interpretar esse elemento (planet, asteroid, portais, (?))
+                type: asteroid
+
+                model:
+                        # Caminho para o modelo deste elemento (partindo de resources/models)
+                        file: planets/io.ply
+                        # Aplica esse scale antes de desenhar [opcional]
+                        scale: 1
+                        rotate: [0,0,0]
+                        translate: [0,0,0]
+
+                # Indica se os tiros afetam esse elemento
+                destructible: yes
+                # Life do elemento, só aparece se destructible = yes
+                hp: 10000
+
+                # Indica se uma colisao com a nave tira hp da nave
+                destroys_player: yes
+
+        -
                 name: Neptune
                 subtitle: Gas giant
 
@@ -130,6 +155,20 @@ scene:
                                 max_radius_direction: [1,0,0]
                                 # Vetor com a direção do raio menor
                                 min_radius_direction: [0,1,0]
+
+                        mass: 50
+                -
+                        element: Asteroid1
+                        rotation_velocity: [0,0,0]
+
+                        movement:
+                                type: orbit
+                                # Id do objeto central da órbita
+                                center_planet_name: Neptune
+                                # Vetor com a direção do raio maior
+                                radius_orbit: 100
+                                # Posicao em relacaoo ao centro do planeta
+                                start_position: [10, 10, 10]
 
                         mass: 50
 

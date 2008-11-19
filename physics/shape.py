@@ -40,9 +40,14 @@ class Shape:
 		
 		for f in self.forces_res:
 			f_res += f
-		
-		self.aceleration = self.aceleration + self.aceleration.normalizing().scalar(-f_res)
-		self.aceleration = self.aceleration.scalar(1/self.mass) 
+			
+		if (f_res > self.aceleration.get_mod()):
+			self.aceleration.x = 0.
+			self.aceleration.y = 0.
+			self.aceleration.z = 0.
+		else:
+			self.aceleration = self.aceleration + self.aceleration.normalizing().scalar(-f_res)
+			self.aceleration = self.aceleration.scalar(1/self.mass) 
 		
 	def calculate_velocity(self, delta):
 		# v = v0 + a.DELTA
