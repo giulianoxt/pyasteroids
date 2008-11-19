@@ -12,12 +12,8 @@ from model.ply import PLYModel
 
 
 class GLModel(object):
-    def __init__(self, file, name = '', subtitle = '',
-            translate = (0.,0.,0.), rotate = (0.,0.,0.), scale = 0.):
+    def __init__(self, file, translate = (0.,0.,0.), rotate = (0.,0.,0.), scale = 0.):
         self.ply = PLYModel(file)
-        
-        self.name = name
-        self.subtitle = subtitle
         
         self.textures = None
         self.dlist = None

@@ -1,10 +1,9 @@
 from physics.vector3d import Vector3d 
 
+
 class Shape:
-	
-	# m : mass
-	def __init__(self, model, m = 0.0, pos = Vector3d(0.,0.,0.)):
-		self.mass = m
+	def __init__(self, mass = 0.0, pos = Vector3d(0.,0.,0.)):
+		self.mass = mass
 		self.position = pos
 		self.velocity = Vector3d(0., 0., 0.)
 		self.aceleration = Vector3d(0., 0., 0.)
@@ -25,8 +24,6 @@ class Shape:
 		# resistence force
 		# positive real values list 
 		self.forces_res = []
-
-		self.model = model
 	
 	def calculate_aceleration(self):
 
@@ -59,9 +56,12 @@ class Shape:
 		self.angle_x = self.angle_x + self.velocity_angular_x*delta
 		self.angle_y = self.angle_y + self.velocity_angular_y*delta
 		self.angle_z = self.angle_z + self.velocity_angular_z*delta
-		
 
 	def update(self, delta):
 		self.calculate_velocity(delta)
 		self.calculate_position(delta)
 		self.calculate_angle(delta)
+
+
+class OrbitShape(Shape):
+	pass

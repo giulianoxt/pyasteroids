@@ -77,23 +77,6 @@ elements:
                 shape:
                         type: bounding_box
 
-        -
-                name: Gunboat
-                subtitle: Test ship
-
-                type: ship
-
-                model:
-                        file: gunboat/gunboat2.ply
-                        scale: 0.02
-                        rotate: [0,0,0]
-                        translate: [0,0,0]                        
-
-                destroys_player: no
-
-                shape:
-                        type: bounding_box
-
 
 scene:
         # Dimensões da cena. x, y e z  vão de -1000 à 1000
@@ -148,19 +131,6 @@ scene:
                                 min_radius_direction: [0,1,0]
 
                         mass: 50
-                        
-                -
-                        element: Gunboat
-                        
-                        pos: [-20,0,-40]
-
-                        rotation_velocity: [40,50,20]
-
-                        movement:
-                                type: static
-                                
-                        mass: 50
-
 
         stars:
                 # Número de estrelas aleatórias para serem desenhadas no background

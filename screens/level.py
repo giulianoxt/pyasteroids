@@ -7,6 +7,11 @@ from physics.shape import Shape
 from model.opengl import GLModel
 from physics.vector3d import Vector3d
 
+from objects.portal import Portal
+from objects.planet import Planet
+from objects.asteroid import Asteroid
+from objects.spaceship import SpaceShip
+
 
 class Level(object):
     def __init__(self, level_number):
@@ -35,47 +40,56 @@ class Level(object):
             rotate = element['model']['rotate']
             scale = element['model']['scale']
             
-            models[element['name']] = GLModel(
-                file, name, subtitle, translate, rotate, scale
-            )
+            gl_model = GLModel(file, translate, rotate, scale)
+            
+            models[name] = (gl_model, element)            
             
             file.close()
         
         for object in lvl['scene']['objects']:
-            model = models[object['element']]
+            element_name = object['element']
+            
+            shape = None
+            
+            model, element = models[element_name]
+            
             mass = float(object['mass'])
             
             rvel = object['rotation_velocity']
 
-            if (not 'pos' in object):
-                continue
+            movement = object['movement']['type']
 
-            pos = Vector3d(*object['pos'])
+            if (movement == 'static'):
+                pos = Vector3d(*object['pos'])
             
-            shape = Shape(model, mass, pos)
+                shape = Shape(mass, pos)
             
-            shape.velocity_angular_x = rvel[0]
-            shape.velocity_angular_y = rvel[1]
-            shape.velocity_angular_z = rvel[2]
+                shape.velocity_angular_x = rvel[0]
+                shape.velocity_angular_y = rvel[1]
+                shape.velocity_angular_z = rvel[2]
+            elif (movement == 'orbit'):
+                # TODO: support for orbit movement
+                continue
+                       
+            type = element['type']
             
-            self.objects.append(shape)
+            type_class = {
+                'planet'       : Planet,
+                'asteroid'     : Asteroid,
+                'start_portal' : Portal,
+                'end_portal'   : Portal
+            }
+            
+            object = type_class[type](model, shape, element)
+            
+            self.objects.append(object)
 
     def draw(self):
         glMatrixMode(GL_MODELVIEW)
         
-        for shape in self.objects:
-            glPushMatrix()
-
-            glTranslate(shape.position.x, shape.position.y, shape.position.z)
-            
-            glRotatef(shape.angle_x, 1., 0., 0.)
-            glRotatef(shape.angle_y, 0., 1., 0.)
-            glRotatef(shape.angle_z, 0., 0., 1.)
-            
-            shape.model.draw()
-            
-            glPopMatrix()            
+        for obj in self.objects:
+            obj.draw()
     
     def tick(self, time_elapsed):
-        for shape in self.objects:
-            shape.update(time_elapsed)
+        for obj in self.objects:
+            obj.tick(time_elapsed)

@@ -10,7 +10,6 @@ def atan2(y, x):
 		return atan(y/x)
 
 class Vector3d:
-	
 	def __init__(self, x_val, y_val, z_val):
 		self.x = x_val
 		self.y = y_val
@@ -30,6 +29,9 @@ class Vector3d:
 	# dot scalar
 	def __mul__(self, vec3d):
 		return (self.x*vec3d.x + self.y*vec3d.y + self.z*vec3d.z)
+	
+	def __iter__(self):
+		return iter((self.x, self.y, self.z))
 	
 	# cross product
 	def cross_product(self, vec3d):
