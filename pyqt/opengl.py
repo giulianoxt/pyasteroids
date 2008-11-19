@@ -1,4 +1,5 @@
 import os
+import sys
 from time import time
 
 from OpenGL.GL import *
@@ -100,7 +101,7 @@ class GLController(QGLWidget):
         
         self.fps = 1 / elapsed
         
-        print 'fps =', self.fps
+        #print 'fps =', self.fps
         
         # if we run out of screens, the game is over
         if (not len(self.screen_stack)):
@@ -137,10 +138,13 @@ class GLController(QGLWidget):
             # remove extension
             f = f[0:f.rfind('.')]
             
+            print 'file =', f
+            
             try:
                 m = __import__('screens.'+f, fromlist=[f])
                 submodules.append(m)
             except:
+                print 'error = ', sys.exc_info()
                 pass
                 
         modules = submodules + [screens]
