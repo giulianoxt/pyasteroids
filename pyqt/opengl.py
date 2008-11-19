@@ -77,6 +77,7 @@ class GLController(QGLWidget):
         fovy = cfg.get('y_field_of_view')
         z_near = cfg.get('z_near')
         z_far = cfg.get('z_far')
+        
         gluPerspective(fovy,float(width)/height,z_near,z_far)
 
     def paintGL(self):

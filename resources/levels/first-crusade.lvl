@@ -36,10 +36,6 @@ elements:
                 # Indica se uma colisao com a nave tira hp da nave
                 destroys_player: yes
 
-                # Informações do shape do elemento (utilizado para detecção de colisão)
-                shape:
-                        type: bounding_sphere
-
         -
                 name: Neptune
                 subtitle: Gas giant
@@ -56,9 +52,6 @@ elements:
 
                 destroys_player: yes
 
-                shape:
-                        # Bounding sphere (BS), axis-aligned-bounding-box (AABB) ou oriented-bounding-box (OBB)
-                        type: bounding_sphere
         -
                 name: Begin
                 subtitle: Start portal
@@ -67,16 +60,24 @@ elements:
                 type: start_portal
 
                 model:
-                        file: planets/io.ply
-                        scale: 2
+                        file: portals/simple-portal.ply
+                        scale: 5
                         rotate: [0,0,0]
                         translate: [0,0,0]                        
 
                 destroys_player: no
 
-                shape:
-                        type: bounding_box
+        -
+                name: Simple-Spaceship
+                subtitle: Ship
 
+                type: spaceship
+
+                model:
+                        file: simple-spaceship/spaceship.ply
+                        scale: 0.05
+                        rotate: [120,23.3,-3.3]
+                        translate: [0,0,0]
 
 scene:
         # Dimensões da cena. x, y e z  vão de -1000 à 1000
@@ -96,7 +97,7 @@ scene:
                         pos: [0,0,-20]
            
                         # Velocidades de rotação nos 3 eixos (graus / segundo)
-                        rotation_velocity: [0,100,0]
+                        rotation_velocity: [50,50,50]
 
                         # Não tem movimento
                         movement:
@@ -135,3 +136,8 @@ scene:
         stars:
                 # Número de estrelas aleatórias para serem desenhadas no background
                 num: 200
+
+ship:
+        model: Simple-Spaceship
+        mass: 50
+        camera-dist: 15

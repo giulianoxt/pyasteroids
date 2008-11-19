@@ -12,11 +12,15 @@ from objects.planet import Planet
 from objects.asteroid import Asteroid
 from objects.spaceship import SpaceShip
 
+from screens.camera import Camera
+
 
 class Level(object):
     def __init__(self, level_number):
         self.number = level_number
+        
         self.objects = []
+        self.camera = None
         
         level_name = Config('levels','Levels').get(str(level_number))
         
@@ -77,15 +81,37 @@ class Level(object):
                 'planet'       : Planet,
                 'asteroid'     : Asteroid,
                 'start_portal' : Portal,
-                'end_portal'   : Portal
+                'end_portal'   : Portal,
             }
             
             object = type_class[type](model, shape, element)
             
             self.objects.append(object)
+        
+        self.make_spaceship(lvl, models)
+
+    def make_spaceship(self, lvl, models):
+        pos = None
+        
+        for obj in self.objects:
+            if (isinstance(obj, Portal) and (obj.type == 'start')):
+                pos = obj.shape.position
+                break
+            
+        shape = Shape(lvl['ship']['mass'], pos)
+        
+        model, element = models[lvl['ship']['model']]
+        
+        self.ship = SpaceShip(model, shape, element)
+        
+        self.camera = Camera(self.ship, lvl['ship']['camera-dist'])
+        
+        self.objects.append(self.ship)
 
     def draw(self):
         glMatrixMode(GL_MODELVIEW)
+        
+        self.camera.put_in_position()
         
         for obj in self.objects:
             obj.draw()
@@ -93,3 +119,5 @@ class Level(object):
     def tick(self, time_elapsed):
         for obj in self.objects:
             obj.tick(time_elapsed)
+
+        self.camera.tick(time_elapsed)
