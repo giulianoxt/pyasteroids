@@ -29,6 +29,7 @@ class GLController(QGLWidget):
     def adjust_widget(self):
         self.setAttribute(Qt.WA_KeyCompression,False)
         self.setMouseTracking(True)
+        self.setFocus()
     
     def adjust_timer(self):
         self.timer = QTimer(self)
@@ -111,17 +112,6 @@ class GLController(QGLWidget):
         
         self.updateGL()
 
-    # dynamic dispatch of qt events to screens
-    def __getattr__(self, attr):
-        # if its an event (keyPressEvent, mousePressEvent, etc..)
-        if (attr.endswith('Event')):
-            print 'event = ', attr
-            
-            # let the top screen handle it
-            return getattr(self.screen_stack[-1], attr)
-        else:
-            raise AttributeError
-
     def pop_screen(self, screen):
         # erases that screen and all above it
         i = self.screen_stack.index(screen)
@@ -143,7 +133,7 @@ class GLController(QGLWidget):
                 m = __import__('screens.'+f, fromlist=[f])
                 submodules.append(m)
             except:
-                print 'f =', f, 'err = ', sys.exc_info()
+                print 'file =', f, 'error = ', sys.exc_info()
                 pass
                 
         modules = submodules + [screens]
@@ -163,28 +153,29 @@ class GLController(QGLWidget):
         # finally, push it
         self.screen_stack.append(new_screen)
 
-#    def keyPressEvent(self, keyEvent):        
-#        k = keyEvent.key()
-#        
-#        if (k == self.key_esc or k == self.key_quit):
-#            self.parent.parent().close()
-#        else:
-#            self.state.keyPressEvent(keyEvent)
-#    
-#    def keyReleaseEvent(self, keyEvent):
-#        self.state.keyReleaseEvent(keyEvent)
-#
-#    def mouseMoveEvent(self, mouseEvent):
-#        self.state.mouseMoveEvent(mouseEvent)
-#    
-#    def mousePressEvent(self, mouseEvent):
-#        self.state.mousePressEvent(mouseEvent)
-#    
-#    def mouseReleaseEvent(self, mouseEvent):
-#        self.state.mouseReleaseEvent(mouseEvent)
-#
-#    def contextMenuEvent(self, contextEvent):
-#        self.state.contextMenuEvent(contextEvent)
-#    
-#    def getMousePos(self):
-#        return self.mapFromGlobal(QCursor.pos())
+    def keyPressEvent(self, keyEvent):       
+        self.send_generic_event('keyPressEvent', keyEvent)
+    
+    def keyReleaseEvent(self, keyEvent):
+        self.send_generic_event('keyReleaseEvent', keyEvent)
+
+    def mouseMoveEvent(self, mouseEvent):
+        self.send_generic_event('mouseMoveEvent', mouseEvent)
+    
+    def mousePressEvent(self, mouseEvent):
+        self.send_generic_event('mousePressEvent', mouseEvent)
+    
+    def mouseReleaseEvent(self, mouseEvent):
+        self.send_generic_event('mouseReleaseEvent', mouseEvent)
+
+    def send_generic_event(self, event_name, event_arg):
+        if (not len(self.screen_stack)):
+            return
+        
+        screen = self.screen_stack[-1]
+        
+        if (hasattr(screen, event_name)):
+            getattr(screen, event_name)(event_arg)
+    
+    def mouse_pos(self):
+        return self.mapFromGlobal(QCursor.pos())

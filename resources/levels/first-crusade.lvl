@@ -101,7 +101,7 @@ elements:
                 model:
                         file: simple-spaceship/spaceship.ply
                         scale: 0.05
-                        rotate: [120,23.3,-3.3]
+                        rotate: [130,23.3,-3.3]
                         translate: [0,0,0]
 
 scene:

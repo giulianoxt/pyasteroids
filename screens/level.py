@@ -2,6 +2,8 @@ import yaml
 
 from OpenGL.GL import *
 
+from PyQt4.QtCore import Qt
+
 from util.config import Config
 from physics.shape import Shape
 from model.opengl import GLModel
@@ -127,3 +129,7 @@ class Level(object):
             obj.tick(time_elapsed)
 
         self.camera.tick(time_elapsed)
+
+    def keyPressEvent(self, event):
+        if (event.key() == Qt.Key_Escape):
+            self.controller.pop_screen(self)
