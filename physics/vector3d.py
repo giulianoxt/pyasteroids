@@ -56,8 +56,11 @@ class Vector3d:
 	
 	# returns a unitary vector
 	def normalizing(self):
-		tmp_mod = self.get_mod()
-		return Vector3d(self.x/tmp_mod, self.y/tmp_mod, self.z/tmp_mod)
+		try:
+			tmp_mod = self.get_mod()
+			return Vector3d(self.x/tmp_mod, self.y/tmp_mod, self.z/tmp_mod)
+		except ZeroDivisionError:
+			return Vector3d(0.,0.,0.)
 	
 	# angle ( radians ) between the positive x-axis and vector projected onto the xy-plane
 	def angle_phi(self):

@@ -18,24 +18,24 @@ class Camera(object):
 
         self.recalculate_vectors()
             
-    def recalculate_vectors(self):        
-        sh = self.ship.shape
-        ax, ay, az = sh.angle_x, sh.angle_y, sh.angle_z
-
-        rotation = Quaternion.from_axis_rotations(ax,ay,az)
-
-        ship_dir = rotation * Vector3d(0.,0.,-1.).normalizing()
-
-        up_dir = rotation * Vector3d(0.,1.,0.).normalizing()
+    def recalculate_vectors(self):
+        if (not hasattr(self.ship, 'ship_dir') or not hasattr(self.ship, 'up_dir')):
+            return
+                        
+        ship_dir = self.ship.ship_dir
+        up_dir = self.ship.up_dir
         
         oposite = ship_dir.scalar(-1.)
         oposite = oposite.scalar(self.dist)
 
-        self.pos = sh.position + oposite
+        self.pos = self.ship.shape.position + oposite
         self.look = self.pos + ship_dir
         self.up = up_dir
         
     def put_in_position(self):
+        if (self.pos is None):
+            return
+        
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
         

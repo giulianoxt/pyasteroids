@@ -128,7 +128,7 @@ scene:
                         movement:
                                 type: static
                                 
-                        mass: 300
+                        mass: 300.0
 
                 -
                         # Precisa desse id para referenciar quando for criar órbita, ali embaixo
@@ -141,7 +141,7 @@ scene:
                         movement:
                                 type: static
                                 
-                        mass: 50
+                        mass: 50.0
 
                 -
                         element: Io
@@ -156,7 +156,7 @@ scene:
                                 # Posicao em relacaoo ao centro do planeta
                                 start_position: [10, 10, 10]
 
-                        mass: 50
+                        mass: 50.0
                 -
                         element: Asteroid1
                         rotation_velocity: [0,0,0]
@@ -170,7 +170,7 @@ scene:
                                 # Posicao em relacaoo ao centro do planeta
                                 start_position: [10, 10, 10]
 
-                        mass: 50
+                        mass: 50.0
 
         stars:
                 # Número de estrelas aleatórias para serem desenhadas no background
@@ -178,5 +178,5 @@ scene:
 
 ship:
         model: Simple-Spaceship
-        mass: 50
+        mass: 50.0
         camera-dist: 15

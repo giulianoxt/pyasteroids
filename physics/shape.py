@@ -32,7 +32,7 @@ class Shape:
 		
 		for f in total_forces :
 			self.aceleration = self.aceleration + f
-			
+		
 		# clear temporary forces
 		self.forces_tmp = []
 		
@@ -40,18 +40,16 @@ class Shape:
 		
 		for f in self.forces_res:
 			f_res += f
-			
+		
 		if (f_res > self.aceleration.get_mod()):
 			self.aceleration.x = 0.
 			self.aceleration.y = 0.
 			self.aceleration.z = 0.
 		else:
 			self.aceleration = self.aceleration + self.aceleration.normalizing().scalar(-f_res)
-			self.aceleration = self.aceleration.scalar(1/self.mass) 
+			self.aceleration = self.aceleration.scalar(1.0/self.mass)
 		
 	def calculate_velocity(self, delta):
-		# v = v0 + a.DELTA
-		# DELTA is update ratio
 		self.velocity = self.velocity + self.aceleration.scalar(delta)
 		
 	def calculate_position(self, delta):
@@ -63,9 +61,10 @@ class Shape:
 		self.angle_z = self.angle_z + self.velocity_angular_z*delta
 
 	def update(self, delta):
+		self.calculate_aceleration()
 		self.calculate_velocity(delta)
 		self.calculate_position(delta)
-		self.calculate_angle(delta)
+		self.calculate_angle(delta) 
 
 
 class OrbitShape(Shape):

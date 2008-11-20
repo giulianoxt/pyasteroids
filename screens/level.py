@@ -131,5 +131,21 @@ class Level(object):
         self.camera.tick(time_elapsed)
 
     def keyPressEvent(self, event):
-        if (event.key() == Qt.Key_Escape):
+        k = event.key()
+        
+        if (k == Qt.Key_Escape):
             self.controller.pop_screen(self)
+        elif (k == Qt.Key_W):
+            self.ship.move_forward()
+        elif (k == Qt.Key_A):
+            self.ship.move_left()
+        elif (k == Qt.Key_D):
+            self.ship.move_right()
+        elif (k == Qt.Key_Up):
+            self.ship.spin_up()
+        elif (k == Qt.Key_Down):
+            self.ship.spin_down()
+        elif (k == Qt.Key_Left):
+            self.ship.spin_left()
+        elif (k == Qt.Key_Right):
+            self.ship.spin_right()
