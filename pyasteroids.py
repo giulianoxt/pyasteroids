@@ -32,7 +32,7 @@ def start_pyasteroids():
 
     # Gives control to Qt
     app.exec_()
-
+    
 
 if __name__ == '__main__':
     print '# PyAsteroids3D #\n'

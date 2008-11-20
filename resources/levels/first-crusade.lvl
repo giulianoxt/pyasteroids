@@ -24,32 +24,7 @@ elements:
                         # Caminho para o modelo deste elemento (partindo de resources/models)
                         file: planets/io.ply
                         # Aplica esse scale antes de desenhar [opcional]
-                        scale: 1
-                        rotate: [0,0,0]
-                        translate: [0,0,0]
-
-                # Indica se os tiros afetam esse elemento
-                destructible: yes
-                # Life do elemento, só aparece se destructible = yes
-                hp: 10000
-
-                # Indica se uma colisao com a nave tira hp da nave
-                destroys_player: yes
-
-        -
-                # Título e subtítulo que vão aparecer na interface
-                # quando o jogador mirar nesse elemento com a arma
-                name: Asteroid1
-                subtitle: Asteroid Big-Stick
-
-                # Type indica como o jogo irá interpretar esse elemento (planet, asteroid, portais, (?))
-                type: asteroid
-
-                model:
-                        # Caminho para o modelo deste elemento (partindo de resources/models)
-                        file: planets/io.ply
-                        # Aplica esse scale antes de desenhar [opcional]
-                        scale: 1
+                        scale: 2
                         rotate: [0,0,0]
                         translate: [0,0,0]
 
@@ -69,7 +44,7 @@ elements:
 
                 model:
                         file: planets/neptune.ply
-                        scale: 1
+                        scale: 20
                         rotate: [0,0,0]
                         translate: [0,0,0]                        
 
@@ -86,7 +61,7 @@ elements:
 
                 model:
                         file: portals/simple-portal.ply
-                        scale: 5
+                        scale: 8
                         rotate: [0,0,0]
                         translate: [0,0,0]                        
 
@@ -99,10 +74,11 @@ elements:
                 type: spaceship
 
                 model:
-                        file: simple-spaceship/spaceship.ply
-                        scale: 0.05
-                        rotate: [130,23.3,-3.3]
-                        translate: [0,0,0]
+                        file: combat-ship/combat-ship.ply
+                        scale: 0.04
+                        #rotate: [120,23.3,-3.3]
+                        rotate: [90,180,0]
+                        translate: [0,-3.5,0]
 
 scene:
         # Dimensões da cena. x, y e z  vão de -1000 à 1000
@@ -119,7 +95,7 @@ scene:
                         # Os elementos são referenciados pelo nome
                         element: Begin
                         # Posição inicial do objeto
-                        pos: [0,0,-20]
+                        pos: [0,0,130]
            
                         # Velocidades de rotação nos 3 eixos (graus / segundo)
                         rotation_velocity: [50,50,50]
@@ -128,7 +104,7 @@ scene:
                         movement:
                                 type: static
                                 
-                        mass: 300.0
+                        mass: 300
 
                 -
                         # Precisa desse id para referenciar quando for criar órbita, ali embaixo
@@ -136,12 +112,12 @@ scene:
                         element: Neptune
                         pos: [7,7,-20]
 
-                        rotation_velocity: [300,0,0]
+                        rotation_velocity: [90,90,90]
 
                         movement:
                                 type: static
                                 
-                        mass: 50.0
+                        mass: 50
 
                 -
                         element: Io
@@ -150,27 +126,33 @@ scene:
                         movement:
                                 type: orbit
                                 # Id do objeto central da órbita
-                                center_planet_id: 1
-                               # Vetor com a direção do raio maior
-                                radius_orbit: 100
-                                # Posicao em relacaoo ao centro do planeta
-                                start_position: [10, 10, 10]
+                                center_planet_name: Neptune
+                                radius: 60
+                                rot_xy: 0.0
+                                rot_z: 0.1122
+                                rot_velocity_xy: 0.0
+                                rot_velocity_z: 1.0
+                            
 
-                        mass: 50.0
+                        mass: 50
+
                 -
-                        element: Asteroid1
-                        rotation_velocity: [0,0,0]
+                        element: Io
+                        rotation_velocity: [180,180,180]
 
                         movement:
                                 type: orbit
                                 # Id do objeto central da órbita
-                                center_planet_id: 1
-                                # Vetor com a direção do raio maior
-                                radius_orbit: 100
-                                # Posicao em relacaoo ao centro do planeta
-                                start_position: [10, 10, 10]
+                                center_planet_name: Neptune
+                                radius: 75
+                                rot_xy: 0.0
+                                rot_z: 0.1122
+                                rot_velocity_xy: 0.5
+                                rot_velocity_z: 1.0
+                            
 
-                        mass: 50.0
+                        mass: 50
+
 
         stars:
                 # Número de estrelas aleatórias para serem desenhadas no background
@@ -178,5 +160,5 @@ scene:
 
 ship:
         model: Simple-Spaceship
-        mass: 50.0
-        camera-dist: 15
+        mass: 50
+        camera-dist: 10

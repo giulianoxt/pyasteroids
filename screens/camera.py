@@ -2,7 +2,6 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 
 from physics.vector3d import Vector3d
-from physics.quaternion import Quaternion
 
 v3d = Vector3d
 
@@ -19,9 +18,9 @@ class Camera(object):
         self.recalculate_vectors()
             
     def recalculate_vectors(self):
-        if (not hasattr(self.ship, 'ship_dir') or not hasattr(self.ship, 'up_dir')):
+        if (self.ship.ship_dir is None):
             return
-                        
+        
         ship_dir = self.ship.ship_dir
         up_dir = self.ship.up_dir
         
@@ -29,8 +28,10 @@ class Camera(object):
         oposite = oposite.scalar(self.dist)
 
         self.pos = self.ship.shape.position + oposite
-        self.look = self.pos + ship_dir
+        self.look = self.ship.shape.position + ship_dir
         self.up = up_dir
+        
+        light_pos = self.ship.shape.position + oposite.scalar(400)
         
     def put_in_position(self):
         if (self.pos is None):

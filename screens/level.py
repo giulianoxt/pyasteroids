@@ -52,7 +52,7 @@ class Level(object):
             
             file.close()
         
-        id_object = {}
+        poss = { }
         
         for object in lvl['scene']['objects']:
             element_name = object['element']
@@ -69,16 +69,19 @@ class Level(object):
 
             if (movement == 'static'):
                 pos = Vector3d(*object['pos'])
-                shape = Shape(mass, pos)	       	
-                shape.velocity_angular_x = rvel[0]
-                shape.velocity_angular_y = rvel[1]
-                shape.velocity_angular_z = rvel[2]
-            elif (movement == 'orbit'):
-                pos = Vector3d(*object['movement']['start_position'])
-                shape = Shape(mass, pos)
+                poss[element_name] = pos
                 
-                #center_planet_id = object['movement']['center_planet_id']
-                #center_planet_shape = id_object[center_planet_id].shape
+                shape = Shape(mass, pos)	       	
+            elif (movement == 'orbit'):
+                shape = Shape(mass, poss[object['movement']['center_planet_name']])
+                shape.rotation_radius = object['movement']['radius']
+                shape.rot_vel_xy = object['movement']['rot_velocity_xy']
+                shape.rot_vel_z = object['movement']['rot_velocity_z']
+
+                       
+            shape.velocity_angular_x = rvel[0]
+            shape.velocity_angular_y = rvel[1]
+            shape.velocity_angular_z = rvel[2]
                        
             type = element['type']
             
@@ -92,9 +95,6 @@ class Level(object):
             _object = type_class[type](model, shape, element)
             
             self.objects.append(_object)
-            
-            if (hasattr(object, 'id')):
-                id_object[object['id']] = _object
         
         self.make_spaceship(lvl, models)
 
@@ -142,10 +142,22 @@ class Level(object):
         elif (k == Qt.Key_D):
             self.ship.move_right()
         elif (k == Qt.Key_Up):
-            self.ship.spin_up()
+            self.ship.spin('up', True)
         elif (k == Qt.Key_Down):
-            self.ship.spin_down()
+            self.ship.spin('down', True)
         elif (k == Qt.Key_Left):
-            self.ship.spin_left()
+            self.ship.spin('left', True)
         elif (k == Qt.Key_Right):
-            self.ship.spin_right()
+            self.ship.spin('right', True)
+
+    def keyReleaseEvent(self, event):
+        k = event.key()
+        
+        if (k == Qt.Key_Up):
+            self.ship.spin('up', False)
+        elif (k == Qt.Key_Down):
+            self.ship.spin('down', False)
+        elif (k == Qt.Key_Left):
+            self.ship.spin('left', False)
+        elif (k == Qt.Key_Right):
+            self.ship.spin('right', False)

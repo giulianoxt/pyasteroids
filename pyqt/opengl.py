@@ -25,6 +25,8 @@ class GLController(QGLWidget):
         
         self.adjust_widget()
         self.adjust_timer()
+        
+        self.primeiro = True
     
     def adjust_widget(self):
         self.setAttribute(Qt.WA_KeyCompression,False)
@@ -60,7 +62,7 @@ class GLController(QGLWidget):
         # Enable transparency by alpha value
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
                 
-        glClearColor(*map(lambda c : c / 255.0, self.clearColor)) 
+        glClearColor(*map(lambda c : c / 255.0, self.clearColor))
         
         self.screen_stack = []
             
@@ -102,6 +104,8 @@ class GLController(QGLWidget):
         self.last_time = new_time
         
         self.fps = 1 / elapsed
+        
+        print 'fps =', self.fps
         
         # if we run out of screens, the game is over
         if (not len(self.screen_stack)):

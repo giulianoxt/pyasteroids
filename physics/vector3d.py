@@ -15,6 +15,18 @@ class Vector3d:
 		self.y = y_val
 		self.z = z_val
 	
+	@classmethod
+	def x_axis(cls):
+		return Vector3d(1., 0., 0.)
+	
+	@classmethod
+	def y_axis(cls):
+		return Vector3d(0., 1., 0.)
+	
+	@classmethod
+	def z_axis(cls):
+		return Vector3d(0., 0., 1.)
+	
 	# length of vector
 	def get_mod(self):
 		return sqrt(self.x*self.x + self.y*self.y + self.z*self.z)

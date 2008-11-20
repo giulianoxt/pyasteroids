@@ -1,3 +1,5 @@
+from math import *
+
 from physics.vector3d import Vector3d 
 
 
@@ -11,6 +13,15 @@ class Shape:
 		self.velocity_angular_x = 0.0
 		self.velocity_angular_y = 0.0
 		self.velocity_angular_z = 0.0
+		
+		self.rotation_center = Vector3d(pos.x, pos.y, pos.z)
+		
+		self.rotation_radius = None
+		self.rot_xy = 0.
+		self.rot_z = 0.
+		self.rot_vel_xy = 0.
+		self.rot_vel_z = 0.
+		
 		# angles ( degree )
 		self.angle_x = 0.0 
 		self.angle_y = 0.0
@@ -24,7 +35,17 @@ class Shape:
 		# resistence force
 		# positive real values list 
 		self.forces_res = []
-	
+
+	def calculate_rotation(self, delta):
+		if (self.rotation_radius is None):
+			return
+		
+		self.rot_xy = self.rot_xy + self.rot_vel_xy*delta
+		self.rot_z = self.rot_z + self.rot_vel_z*delta
+		self.position.x = self.rotation_center.x + self.rotation_radius*sin(self.rot_z)*cos(self.rot_xy)
+		self.position.y = self.rotation_center.y + self.rotation_radius*sin(self.rot_z)*sin(self.rot_xy)	
+		self.position.z = self.rotation_center.z + self.rotation_radius*cos(self.rot_z)	
+
 	def calculate_aceleration(self):
 
 		self.aceleration = Vector3d(0.0, 0.0, 0.0)
@@ -61,6 +82,7 @@ class Shape:
 		self.angle_z = self.angle_z + self.velocity_angular_z*delta
 
 	def update(self, delta):
+		self.calculate_rotation(delta)
 		self.calculate_aceleration()
 		self.calculate_velocity(delta)
 		self.calculate_position(delta)

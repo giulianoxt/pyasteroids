@@ -1,3 +1,5 @@
+from OpenGL.GL import *
+
 from objects import Object
 
 from util.config import Config
@@ -15,25 +17,62 @@ class SpaceShip(Object):
         self.move_force_sz = cfg.get('move_force')
         self.spin_velocity = cfg.get('spin_velocity')
         
-        self.rotation = None
+        self.rotation = Quaternion.from_axis_rotations(0.,0.,0.)
         
-        self.shape.mark = True
+        self.ship_dir = None
+        self.up_dir = None
+        
+        self.spinning = {
+            'up'    : False,
+            'down'  : False,
+            'left'  : False,
+            'right' : False
+        }
+        
+        self.vectors = {
+            'up'    : (Vector3d.x_axis(), 1.),
+            'down'  : (Vector3d.x_axis(), -1.),
+            'left'  : (Vector3d.y_axis(), 1.),
+            'right' : (Vector3d.y_axis(), -1.)
+        }
+
+    def draw(self):        
+        glMatrixMode(GL_MODELVIEW)
+        
+        glPushMatrix()
+                
+        glTranslate(*self.shape.position)
+
+        axis, angle = self.rotation.get_axis_angle()
+        
+        ax, ay, az = axis
+
+        glRotatef(angle, ax, ay, az)
+        
+        self.model.draw()
+        
+        glPopMatrix()
 
     def tick(self, time_elapsed):       
         Object.tick(self, time_elapsed)
         
-        sh = self.shape
-        ax, ay, az = sh.angle_x, sh.angle_y, sh.angle_z
-
-        self.rotation = Quaternion.from_axis_rotations(ax,ay,az)
-
-        self.ship_dir = self.rotation * Vector3d(0.,0.,-1.).normalizing()
-
-        self.up_dir = self.rotation * Vector3d(0.,1.,0.).normalizing()
+        self.update_directions()
+        self.update_spinning(time_elapsed)
         
-#        print 'position = ', self.shape.position
-#        print 'acc = ', self.shape.aceleration
-#        print 'vel = ', self.shape.velocity
+    def update_directions(self):
+        self.ship_dir = self.rotation * Vector3d(0.,0.,-1.)
+
+        self.up_dir = self.rotation * Vector3d(0.,1.,0.)
+
+    def update_spinning(self, time_elapsed):
+        for dir in self.spinning:
+            if (self.spinning[dir]):
+                axis, sign = self.vectors[dir]
+                angle = self.spin_velocity * time_elapsed * sign
+                
+                r = Quaternion.from_axis_angle(axis, angle)
+                
+                self.rotation = self.rotation * r
 
     def move_forward(self):
         force = self.ship_dir.normalizing().scalar(self.move_force_sz)
@@ -46,14 +85,5 @@ class SpaceShip(Object):
     def move_right(self):
         pass
     
-    def spin_up(self):
-        pass
-    
-    def spin_down(self):
-        pass
-    
-    def spin_left(self):
-        pass
-    
-    def spin_right(self):
-        pass
+    def spin(self, dir, b):
+        self.spinning[dir] = b

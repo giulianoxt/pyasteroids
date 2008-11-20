@@ -49,6 +49,17 @@ class Quaternion(object):
     def conjugate(self):
         return Quaternion(-self.x, -self.y, -self.z, self.w)
     
+    def get_axis_angle(self):
+        try:
+            x, y, z, w = self.x, self.y, self.z, self.w
+        
+            s = sqrt(x**2 + y**2 + z**2)
+            a = Vector3d(x / s, y / s, z / s)
+        
+            return (a, degrees(acos(self.w) * 2.))
+        except ZeroDivisionError:
+            return (v3d(0.,0.,0.), 0.)
+    
     def __mul__(self, q):
         if (isinstance(q, Quaternion)):
             r = Quaternion()
@@ -74,3 +85,45 @@ class Quaternion(object):
             res_quat = self * res_quat
             
             return Vector3d(res_quat.x, res_quat.y, res_quat.z)
+
+    def get_matrix(self, mat):
+        self.normalize()
+        
+        if (mat is None):
+            mat = [None]*16
+        
+        X, Y, Z, W = self.x, self.y, self.z, self.w
+        
+        xx = X * X
+        xy = X * Y
+        xz = X * Z
+        xw = X * W
+
+        yy = Y * Y
+        yz = Y * Z
+        yw = Y * W
+
+        zz = Z * Z
+        zw = Z * W
+
+        mat[0]  = 1 - 2 * ( yy + zz )
+        mat[1]  =     2 * ( xy - zw )
+        mat[2]  =     2 * ( xz + yw )
+
+        mat[4]  =     2 * ( xy + zw )
+        mat[5]  = 1 - 2 * ( xx + zz )
+        mat[6]  =     2 * ( yz - xw )
+
+        mat[8]  =     2 * ( xz - yw )
+        mat[9]  =     2 * ( yz + xw )
+        mat[10] = 1 - 2 * ( xx + yy )
+
+        mat[3] = 0.
+        mat[7] = 0.
+        mat[11] = 0.
+        mat[12] = 0.
+        mat[13] = 0.
+        mat[14] = 0.
+        mat[15] = 1.
+
+        return mat
