@@ -6,6 +6,7 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 
 from PyQt4 import QtCore
+from PyQt4.QtGui import QCursor
 from PyQt4.QtOpenGL import QGLWidget
 from PyQt4.QtCore import Qt, QTimer, QObject
 
@@ -101,8 +102,6 @@ class GLController(QGLWidget):
         
         self.fps = 1 / elapsed
         
-        #print 'fps =', self.fps
-        
         # if we run out of screens, the game is over
         if (not len(self.screen_stack)):
             self.parent().close()
@@ -116,6 +115,8 @@ class GLController(QGLWidget):
     def __getattr__(self, attr):
         # if its an event (keyPressEvent, mousePressEvent, etc..)
         if (attr.endswith('Event')):
+            print 'event = ', attr
+            
             # let the top screen handle it
             return getattr(self.screen_stack[-1], attr)
         else:
@@ -138,13 +139,11 @@ class GLController(QGLWidget):
             # remove extension
             f = f[0:f.rfind('.')]
             
-            print 'file =', f
-            
             try:
                 m = __import__('screens.'+f, fromlist=[f])
                 submodules.append(m)
             except:
-                print 'error = ', sys.exc_info()
+                print 'f =', f, 'err = ', sys.exc_info()
                 pass
                 
         modules = submodules + [screens]
@@ -163,3 +162,29 @@ class GLController(QGLWidget):
         
         # finally, push it
         self.screen_stack.append(new_screen)
+
+#    def keyPressEvent(self, keyEvent):        
+#        k = keyEvent.key()
+#        
+#        if (k == self.key_esc or k == self.key_quit):
+#            self.parent.parent().close()
+#        else:
+#            self.state.keyPressEvent(keyEvent)
+#    
+#    def keyReleaseEvent(self, keyEvent):
+#        self.state.keyReleaseEvent(keyEvent)
+#
+#    def mouseMoveEvent(self, mouseEvent):
+#        self.state.mouseMoveEvent(mouseEvent)
+#    
+#    def mousePressEvent(self, mouseEvent):
+#        self.state.mousePressEvent(mouseEvent)
+#    
+#    def mouseReleaseEvent(self, mouseEvent):
+#        self.state.mouseReleaseEvent(mouseEvent)
+#
+#    def contextMenuEvent(self, contextEvent):
+#        self.state.contextMenuEvent(contextEvent)
+#    
+#    def getMousePos(self):
+#        return self.mapFromGlobal(QCursor.pos())

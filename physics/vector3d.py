@@ -1,8 +1,7 @@
 # Version 0.2
 # 15/11/2008
 
-from cmath import *
-from math import radians
+from math import *
 
 def atan2(y, x):
 	if ( x == 0 ):
@@ -89,16 +88,7 @@ class Vector3d:
 			M[1][0]*x + M[1][1]*y + M[1][2]*z,
 			M[2][0]*x + M[2][1]*y + M[2][2]*z,
 		])
-		
-		if (type(nx) == type(0j)):
-			nx = nx.real
-			
-		if (type(ny) == type(0j)):
-			ny = ny.real
-			
-		if (type(nz) == type(0j)):
-			nz = nz.real
-			
+
 		return Vector3d(nx,ny,nz)
 
 	def adjust_complex(self):

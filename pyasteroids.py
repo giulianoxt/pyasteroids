@@ -27,7 +27,7 @@ def start_pyasteroids():
     # Creates the window (GLWidget is created there)
     win = AsteroidsMainWindow() 
 
-    # Pop-up the window
+    # Pop-up the window    
     win.show()
 
     # Gives control to Qt

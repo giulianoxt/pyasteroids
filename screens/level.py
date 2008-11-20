@@ -75,8 +75,8 @@ class Level(object):
                 pos = Vector3d(*object['movement']['start_position'])
                 shape = Shape(mass, pos)
                 
-                center_planet_id = object['movement']['center_planet_id']
-                center_planet_shape = id_object[center_planet_id].shape
+                #center_planet_id = object['movement']['center_planet_id']
+                #center_planet_shape = id_object[center_planet_id].shape
                        
             type = element['type']
             
