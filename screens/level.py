@@ -50,6 +50,8 @@ class Level(object):
             
             file.close()
         
+        id_object = {}
+        
         for object in lvl['scene']['objects']:
             element_name = object['element']
             
@@ -64,14 +66,17 @@ class Level(object):
             movement = object['movement']['type']
 
             if (movement == 'static'):
-		pos = Vector3d(*object['pos'])
+                pos = Vector3d(*object['pos'])
                 shape = Shape(mass, pos)	       	
                 shape.velocity_angular_x = rvel[0]
                 shape.velocity_angular_y = rvel[1]
                 shape.velocity_angular_z = rvel[2]
             elif (movement == 'orbit'):
                 pos = Vector3d(*object['movement']['start_position'])
-		shape = Shape(mass, pos)
+                shape = Shape(mass, pos)
+                
+                center_planet_id = object['movement']['center_planet_id']
+                center_planet_shape = id_object[center_planet_id].shape
                        
             type = element['type']
             
@@ -82,9 +87,12 @@ class Level(object):
                 'end_portal'   : Portal,
             }
             
-            object = type_class[type](model, shape, element)
+            _object = type_class[type](model, shape, element)
             
-            self.objects.append(object)
+            self.objects.append(_object)
+            
+            if (hasattr(object, 'id')):
+                id_object[object['id']] = _object
         
         self.make_spaceship(lvl, models)
 

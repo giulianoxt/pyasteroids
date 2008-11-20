@@ -151,10 +151,10 @@ scene:
                                 type: orbit
                                 # Id do objeto central da órbita
                                 center_planet_id: 1
-                                # Vetor com a direção do raio maior
-                                max_radius_direction: [1,0,0]
-                                # Vetor com a direção do raio menor
-                                min_radius_direction: [0,1,0]
+                               # Vetor com a direção do raio maior
+                                radius_orbit: 100
+                                # Posicao em relacaoo ao centro do planeta
+                                start_position: [10, 10, 10]
 
                         mass: 50
                 -
@@ -164,7 +164,7 @@ scene:
                         movement:
                                 type: orbit
                                 # Id do objeto central da órbita
-                                center_planet_name: Neptune
+                                center_planet_id: 1
                                 # Vetor com a direção do raio maior
                                 radius_orbit: 100
                                 # Posicao em relacaoo ao centro do planeta
