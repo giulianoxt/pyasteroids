@@ -1,8 +1,11 @@
 import yaml
 
 from OpenGL.GL import *
+from OpenGL.GLU import *
 
 from PyQt4.QtCore import Qt
+from PyQt4.QtGui import QImage
+from PyQt4.QtOpenGL import QGLWidget
 
 from util.config import Config
 
@@ -26,9 +29,13 @@ class Level(object):
         self.camera = None
         self.controller = None
         
-        level_name = Config('levels','Levels').get(str(level_number))
+        cfg = Config('levels',str(level_number))
         
+        level_name = cfg.get('name')    
         self.load_file(level_name)
+        
+        skybox = cfg.get('skybox')
+        self.setup_skybox('resources/'+skybox)
             
     def load_file(self, level_name):
         lvl = yaml.load(open('resources/levels/' + level_name + '.lvl'))
@@ -120,7 +127,8 @@ class Level(object):
 
     def draw(self):
         self.camera.put_in_position()
-        #self.draw_skybox(self.camera.pos)
+        
+        self.draw_skybox(self.camera.pos)
 
         for obj in self.objects:
             obj.draw()
@@ -132,35 +140,99 @@ class Level(object):
         self.update_mouse_spin()
         self.camera.tick(time_elapsed)
 
+    def setup_skybox(self, image_path):
+        self.skybox_textures = glGenTextures(6)
+        sides = ('front','left','back','right','top','bottom')
+        
+        for (tex_id, side) in zip(self.skybox_textures, sides):  
+            glBindTexture(GL_TEXTURE_2D, tex_id)
+        
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+        
+            img = QImage(image_path+'-'+side+'.png')
+            img = QGLWidget.convertToGLFormat(img)
+        
+            glTexImage2D(GL_TEXTURE_2D, 0, 3, img.width(), img.height(),
+                0, GL_RGBA, GL_UNSIGNED_BYTE, img.bits().asstring(img.numBytes()))
+            
+            glBindTexture(GL_TEXTURE_2D, 0)
+
     def draw_skybox(self, pos):
         if (pos is None):
             return
         
-        glColor4f(1.,1.,1.,1.)
-        
-        far_z = 1000.0
-        
-        glFrustum(-2.,2.,-1.,1.,1.,far_z)
-        
         glMatrixMode(GL_MODELVIEW)
         glPushMatrix()
-        glLoadIdentity()
         
-        glTranslate(*pos)
-        
+        glTranslated(pos.x,pos.y,pos.z)
+
+        glPushAttrib(GL_ENABLE_BIT)
+        glEnable(GL_TEXTURE_2D)
+        glDisable(GL_DEPTH_TEST)
+        glDisable(GL_LIGHTING)
+        glDisable(GL_BLEND)
+
+        glColor3f(1.,1.,1.)
+
+        # front
+        glBindTexture(GL_TEXTURE_2D, self.skybox_textures[0])
         glBegin(GL_QUADS)
-        glVertex3f(2.,1.,far_z)
-        glVertex3f(2.,-1.,far_z)
-        glVertex3f(-2.,-1.,far_z)
-        glVertex3f(-2.,1.,far_z)
+        glTexCoord2f(0, 0); glVertex3f(0.5,-0.5,-0.5)
+        glTexCoord2f(1, 0); glVertex3f(-0.5, -0.5, -0.5)
+        glTexCoord2f(1, 1); glVertex3f( -0.5,  0.5, -0.5)
+        glTexCoord2f(0, 1); glVertex3f(  0.5,  0.5, -0.5 )
         glEnd()
-        
-        glClear(GL_DEPTH_BUFFER_BIT)
-        
-        glPopMatrix()
-        
-        glMatrixMode(GL_PROJECTION)
-        glPopMatrix()
+
+        # left
+        glBindTexture(GL_TEXTURE_2D, self.skybox_textures[1])
+        glBegin(GL_QUADS)
+        glTexCoord2f(0, 0); glVertex3f(  0.5, -0.5,  0.5 )
+        glTexCoord2f(1, 0); glVertex3f(  0.5, -0.5, -0.5 )
+        glTexCoord2f(1, 1); glVertex3f(  0.5,  0.5, -0.5 )
+        glTexCoord2f(0, 1); glVertex3f(  0.5,  0.5,  0.5 )
+        glEnd()
+
+        # back
+        glBindTexture(GL_TEXTURE_2D, self.skybox_textures[2])
+        glBegin(GL_QUADS)
+        glTexCoord2f(0, 0); glVertex3f( -0.5, -0.5,  0.5 )
+        glTexCoord2f(1, 0); glVertex3f(  0.5, -0.5,  0.5 )
+        glTexCoord2f(1, 1); glVertex3f(  0.5,  0.5,  0.5 )
+        glTexCoord2f(0, 1); glVertex3f( -0.5,  0.5,  0.5 )
+        glEnd()
+
+        # right
+        glBindTexture(GL_TEXTURE_2D, self.skybox_textures[3])
+        glBegin(GL_QUADS)
+        glTexCoord2f(0, 0); glVertex3f( -0.5, -0.5, -0.5 )
+        glTexCoord2f(1, 0); glVertex3f( -0.5, -0.5,  0.5 )
+        glTexCoord2f(1, 1); glVertex3f( -0.5,  0.5,  0.5 )
+        glTexCoord2f(0, 1); glVertex3f( -0.5,  0.5, -0.5 )
+        glEnd()
+
+        # top
+        glBindTexture(GL_TEXTURE_2D, self.skybox_textures[4])
+        glBegin(GL_QUADS)
+        glTexCoord2f(0, 1); glVertex3f( -0.5,  0.5, -0.5 )
+        glTexCoord2f(0, 0); glVertex3f( -0.5,  0.5,  0.5 )
+        glTexCoord2f(1, 0); glVertex3f(  0.5,  0.5,  0.5 )
+        glTexCoord2f(1, 1); glVertex3f(  0.5,  0.5, -0.5 )
+        glEnd()
+
+        # bottom
+        glBindTexture(GL_TEXTURE_2D, self.skybox_textures[5])
+        glBegin(GL_QUADS)
+        glTexCoord2f(0, 0); glVertex3f( -0.5, -0.5, -0.5 )
+        glTexCoord2f(0, 1); glVertex3f( -0.5, -0.5,  0.5 )
+        glTexCoord2f(1, 1); glVertex3f(  0.5, -0.5,  0.5 )
+        glTexCoord2f(1, 0); glVertex3f(  0.5, -0.5, -0.5 )
+        glEnd()
+
+        glBindTexture(GL_TEXTURE_2D, 0)
+
+        glPopAttrib();
+        glPopMatrix();
 
     def keyPressEvent(self, event):
         k = event.key()
