@@ -75,7 +75,7 @@ elements:
 
                 model:
                         file: combat-ship/combat-ship.ply
-                        scale: 0.04
+                        scale: 0.037
                         #rotate: [120,23.3,-3.3]
                         rotate: [90,180,0]
                         translate: [0,-3.5,0]
@@ -147,8 +147,8 @@ scene:
                                 radius: 75
                                 rot_xy: 0.0
                                 rot_z: 0.1122
-                                rot_velocity_xy: 0.5
-                                rot_velocity_z: 1.0
+                                rot_velocity_xy: 1.0
+                                rot_velocity_z: 0.1
                             
 
                         mass: 50

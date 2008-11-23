@@ -17,6 +17,8 @@ class SpaceShip(Object):
         self.move_force_sz = cfg.get('move_force')
         self.spin_velocity = cfg.get('spin_velocity')
         
+        self.mouse_sensivity = Config('game','Mouse').get('sensivity')
+        
         self.rotation = Quaternion.from_axis_rotations(0.,0.,0.)
         
         self.ship_dir = None
@@ -87,3 +89,16 @@ class SpaceShip(Object):
     
     def spin(self, dir, b):
         self.spinning[dir] = b
+
+    def mouse_spin(self, dx, dy):
+        if (dx != 0):
+            ax = self.mouse_sensivity * dx * -1.
+            r = Quaternion.from_axis_angle(Vector3d.y_axis(),ax)
+            
+            self.rotation = self.rotation * r    
+            
+        if (dy != 0):
+            ay = self.mouse_sensivity * dy * -1.
+            r = Quaternion.from_axis_angle(Vector3d.x_axis(),ay)
+            
+            self.rotation = self.rotation * r

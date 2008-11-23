@@ -5,6 +5,7 @@ from OpenGL.GL import *
 from PyQt4.QtCore import Qt
 
 from util.config import Config
+
 from physics.shape import Shape
 from model.opengl import GLModel
 from physics.vector3d import Vector3d
@@ -23,11 +24,12 @@ class Level(object):
         
         self.objects = []
         self.camera = None
+        self.controller = None
         
         level_name = Config('levels','Levels').get(str(level_number))
         
         self.load_file(level_name)
-    
+            
     def load_file(self, level_name):
         lvl = yaml.load(open('resources/levels/' + level_name + '.lvl'))
 
@@ -111,16 +113,15 @@ class Level(object):
         model, element = models[lvl['ship']['model']]
         
         self.ship = SpaceShip(model, shape, element)
-        
+
         self.camera = Camera(self.ship, lvl['ship']['camera-dist'])
-        
+
         self.objects.append(self.ship)
 
     def draw(self):
-        glMatrixMode(GL_MODELVIEW)
-        
         self.camera.put_in_position()
-        
+        #self.draw_skybox(self.camera.pos)
+
         for obj in self.objects:
             obj.draw()
     
@@ -128,7 +129,38 @@ class Level(object):
         for obj in self.objects:
             obj.tick(time_elapsed)
 
+        self.update_mouse_spin()
         self.camera.tick(time_elapsed)
+
+    def draw_skybox(self, pos):
+        if (pos is None):
+            return
+        
+        glColor4f(1.,1.,1.,1.)
+        
+        far_z = 1000.0
+        
+        glFrustum(-2.,2.,-1.,1.,1.,far_z)
+        
+        glMatrixMode(GL_MODELVIEW)
+        glPushMatrix()
+        glLoadIdentity()
+        
+        glTranslate(*pos)
+        
+        glBegin(GL_QUADS)
+        glVertex3f(2.,1.,far_z)
+        glVertex3f(2.,-1.,far_z)
+        glVertex3f(-2.,-1.,far_z)
+        glVertex3f(-2.,1.,far_z)
+        glEnd()
+        
+        glClear(GL_DEPTH_BUFFER_BIT)
+        
+        glPopMatrix()
+        
+        glMatrixMode(GL_PROJECTION)
+        glPopMatrix()
 
     def keyPressEvent(self, event):
         k = event.key()
@@ -149,10 +181,12 @@ class Level(object):
             self.ship.spin('left', True)
         elif (k == Qt.Key_Right):
             self.ship.spin('right', True)
+        elif (k == Qt.Key_B):
+            self.camera.invert()
 
     def keyReleaseEvent(self, event):
         k = event.key()
-        
+
         if (k == Qt.Key_Up):
             self.ship.spin('up', False)
         elif (k == Qt.Key_Down):
@@ -161,3 +195,18 @@ class Level(object):
             self.ship.spin('left', False)
         elif (k == Qt.Key_Right):
             self.ship.spin('right', False)
+        elif (k == Qt.Key_B):
+            self.camera.invert()
+
+    def update_mouse_spin(self):
+        if (self.controller is None):
+            return
+
+        pos = self.controller.cursor().pos()
+        x, y = pos.x(), pos.y()
+
+        m_center = self.controller.mouse_center
+
+        self.controller.cursor().setPos(*m_center)
+
+        self.ship.mouse_spin(x-m_center[0], y-m_center[1])

@@ -12,7 +12,7 @@ from PyQt4.QtCore import Qt, QTimer, QObject
 
 import screens
 from util.config import Config
-
+from util.opengl import setup_perspective
 
 class GLController(QGLWidget):
     def __init__(self, parent):
@@ -25,8 +25,6 @@ class GLController(QGLWidget):
         
         self.adjust_widget()
         self.adjust_timer()
-        
-        self.primeiro = True
     
     def adjust_widget(self):
         self.setAttribute(Qt.WA_KeyCompression,False)
@@ -73,17 +71,9 @@ class GLController(QGLWidget):
     def resizeGL(self, width, height):
         QGLWidget.resizeGL(self,width,height)
         
-        glViewport(0,0,width,height)
+        setup_perspective(width, height)
         
-        glMatrixMode(GL_PROJECTION)
-        glLoadIdentity()
-        
-        cfg = Config('game','OpenGL')
-        fovy = cfg.get('y_field_of_view')
-        z_near = cfg.get('z_near')
-        z_far = cfg.get('z_far')
-        
-        gluPerspective(fovy,float(width)/height,z_near,z_far)
+        self.mouse_center = (width/2, height/2)
 
     def paintGL(self):
         glMatrixMode(GL_MODELVIEW)

@@ -11,6 +11,9 @@ class ConfigManager(object):
     
     @classmethod
     def getInstance(cls):
+        if (ConfigManager.instance is None):
+            ConfigManager.instance = ConfigManager()
+        
         return ConfigManager.instance
     
     def __init__(self):

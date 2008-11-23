@@ -15,6 +15,8 @@ class Camera(object):
         self.look = None
         self.up = None
 
+        self.s = -1.
+
         self.recalculate_vectors()
             
     def recalculate_vectors(self):
@@ -24,7 +26,7 @@ class Camera(object):
         ship_dir = self.ship.ship_dir
         up_dir = self.ship.up_dir
         
-        oposite = ship_dir.scalar(-1.)
+        oposite = ship_dir.scalar(self.s)
         oposite = oposite.scalar(self.dist)
 
         self.pos = self.ship.shape.position + oposite
@@ -48,3 +50,6 @@ class Camera(object):
     
     def tick(self, time_elapsed):
         self.recalculate_vectors()
+        
+    def invert(self):
+        self.s *= -1.
