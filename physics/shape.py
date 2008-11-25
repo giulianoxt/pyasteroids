@@ -5,7 +5,7 @@ from physics.vector3d import Vector3d
 
 class Shape:
 	def __init__(self, mass = 0.0, pos = Vector3d(0.,0.,0.)):
-		self.mass = mass
+		self.mass = mass 
 		self.position = pos
 		self.velocity = Vector3d(0., 0., 0.)
 		self.aceleration = Vector3d(0., 0., 0.)
@@ -45,7 +45,7 @@ class Shape:
 		self.position.x = self.rotation_center.x + self.rotation_radius*sin(self.rot_z)*cos(self.rot_xy)
 		self.position.y = self.rotation_center.y + self.rotation_radius*sin(self.rot_z)*sin(self.rot_xy)	
 		self.position.z = self.rotation_center.z + self.rotation_radius*cos(self.rot_z)	
-
+		
 	def calculate_aceleration(self):
 
 		self.aceleration = Vector3d(0.0, 0.0, 0.0)

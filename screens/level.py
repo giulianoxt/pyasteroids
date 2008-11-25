@@ -125,7 +125,7 @@ class Level(object):
 
             if (movement == 'static'):
                 pos = Vector3d(*object['pos'])
-                poss[element_name] = pos
+                poss[element_name] = pos 
                 
                 shape = Shape(mass, pos)	       	
             elif (movement == 'orbit'):
@@ -133,6 +133,8 @@ class Level(object):
                 shape.rotation_radius = object['movement']['radius']
                 shape.rot_vel_xy = object['movement']['rot_velocity_xy']
                 shape.rot_vel_z = object['movement']['rot_velocity_z']
+		shape.rot_xy = object['movement']['rot_xy']
+		shape.rot_z = object['movement']['rot_z']
 
             shape.velocity_angular_x = rvel[0]
             shape.velocity_angular_y = rvel[1]
