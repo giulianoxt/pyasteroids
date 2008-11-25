@@ -132,7 +132,7 @@ scene:
                         element: Neptune
                         pos: [0,0,0]
 
-                        rotation_velocity: [-20,20,-20]
+                        rotation_velocity: [0,0,-20]
 
                         movement:
                                 type: static

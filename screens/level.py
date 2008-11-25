@@ -46,7 +46,7 @@ class Level(object):
         self.load_file(level_name)
         
         skybox = cfg.get('skybox')
-        self.setup_skybox('resources/'+skybox)
+        #self.setup_skybox('resources/'+skybox)
     
     def add_object(self, obj):
         if (isinstance(obj, SimpleShoot)):
@@ -179,7 +179,7 @@ class Level(object):
     def draw(self):
         self.camera.put_in_position()
         
-        self.draw_skybox(self.camera.pos)
+        #self.draw_skybox(self.camera.pos)
 
         for obj in self.all_objects():
             obj.draw()
@@ -191,7 +191,7 @@ class Level(object):
         self.wrap_ship()
         self.update_mouse_spin(time_elapsed)
         self.camera.tick(time_elapsed)
-        self.update_skybox(time_elapsed)
+        #self.update_skybox(time_elapsed)
 
     def setup_skybox(self, image_path):
         self.skybox_textures = glGenTextures(6)
@@ -318,10 +318,13 @@ class Level(object):
         elif (k == Qt.Key_D):
             self.ship.strafing('right',True)
         elif (k == Qt.Key_B):
-            self.camera.invert()
+            if (not event.isAutoRepeat()):
+                self.camera.invert()
         elif (k == Qt.Key_Space):
             if (not event.isAutoRepeat()):
                 self.ship.simple_gun.start_shoot()
+        else:
+            event.ignore()
 
     def keyReleaseEvent(self, event):
         if (event.isAutoRepeat()):
@@ -342,22 +345,29 @@ class Level(object):
         elif (k == Qt.Key_D):
             self.ship.strafing('right',False)
         elif (k == Qt.Key_B):
-            self.camera.invert()
+            if (not event.isAutoRepeat()):
+                self.camera.invert()
         elif (k == Qt.Key_Space):
             if (not event.isAutoRepeat()):
                 self.ship.simple_gun.end_shoot()
+        else:
+            event.ignore()
 
     def mousePressEvent(self, event):
         b = event.button()
         
         if (b == Qt.LeftButton):
             self.ship.simple_gun.start_shoot()
+        else:
+            event.ignore()
     
     def mouseReleaseEvent(self, event):
         b = event.button()
         
         if (b == Qt.LeftButton):
             self.ship.simple_gun.end_shoot()
+        else:
+            event.ignore()
 
     def update_mouse_spin(self, time_elapsed):
         if (self.controller is None):
@@ -377,16 +387,16 @@ class Level(object):
         dx, dy, dz = map(lambda x : x / 2., self.dimensions)
         
         if (pos.x > dx):
-            pos.x = (-dx) + (pos.x - dx)
+            pos.x -= dx
         elif (pos.x < -dx):
-            pos.x = dx + (pos.x - dx)
+            pos.x += dx
             
         if (pos.y > dy):
-            pos.y = (-dy) + (pos.y - dy)
+            pos.y -= dy
         elif (pos.y < -dy):
-            pos.y = dy + (pos.y - dy)            
+            pos.y += dy            
             
         if (pos.z > dz):
-            pos.z = (-dz) + (pos.z - dz)
+            pos.z -= dz
         elif (pos.z < -dz):
-            pos.z = dz + (pos.z - dz)
+            pos.z += dz
