@@ -1,9 +1,13 @@
 from OpenGL.GL import *
 
 class Object(object):
-    def __init__(self, model, shape):
+    def __init__(self, model, shape, element):
         self.model = model
         self.shape = shape
+    
+        self.destructible = element['destructible']
+        self.hp = element['hp'] if self.destructible else -1
+        self.hostile = element['destroys_player']
     
     def draw(self):
         glMatrixMode(GL_MODELVIEW)

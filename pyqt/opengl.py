@@ -6,8 +6,8 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 
 from PyQt4 import QtCore
-from PyQt4.QtGui import QCursor
 from PyQt4.QtOpenGL import QGLWidget
+from PyQt4.QtGui import QCursor, QPixmap
 from PyQt4.QtCore import Qt, QTimer, QObject
 
 import screens
@@ -30,6 +30,12 @@ class GLController(QGLWidget):
         self.setAttribute(Qt.WA_KeyCompression,False)
         self.setMouseTracking(True)
         self.setFocus()
+        
+        px = QPixmap(32,32)
+        px.fill()
+        px.setMask(px.createHeuristicMask())
+        
+        self.setCursor(QCursor(px))
     
     def adjust_timer(self):
         self.timer = QTimer(self)
@@ -95,7 +101,7 @@ class GLController(QGLWidget):
         
         self.fps = 1 / elapsed
         
-        print 'fps =', self.fps
+        #print 'fps =', self.fps
         
         # if we run out of screens, the game is over
         if (not len(self.screen_stack)):

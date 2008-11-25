@@ -86,8 +86,4 @@ class Shape:
 		self.calculate_aceleration()
 		self.calculate_velocity(delta)
 		self.calculate_position(delta)
-		self.calculate_angle(delta) 
-
-
-class OrbitShape(Shape):
-	pass
+		self.calculate_angle(delta)

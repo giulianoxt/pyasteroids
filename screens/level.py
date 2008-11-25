@@ -1,5 +1,8 @@
 import yaml
 
+from random import uniform
+from itertools import chain
+
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
@@ -13,10 +16,12 @@ from physics.shape import Shape
 from model.opengl import GLModel
 from physics.vector3d import Vector3d
 
+from objects import Object
 from objects.portal import Portal
 from objects.planet import Planet
 from objects.asteroid import Asteroid
 from objects.spaceship import SpaceShip
+from objects.gun import SimpleGun, SimpleShoot
 
 from screens.camera import Camera
 
@@ -25,9 +30,15 @@ class Level(object):
     def __init__(self, level_number):
         self.number = level_number
         
-        self.objects = []
         self.camera = None
         self.controller = None
+        
+        self.objects = set()
+        self.asteroids = set()
+        self.shoots = set()
+        self.planets = set()
+        self.portals = set()
+        self.ship = None
         
         cfg = Config('levels',str(level_number))
         
@@ -36,7 +47,41 @@ class Level(object):
         
         skybox = cfg.get('skybox')
         self.setup_skybox('resources/'+skybox)
-            
+    
+    def add_object(self, obj):
+        if (isinstance(obj, SimpleShoot)):
+            self.shoots.add(obj)
+        elif (isinstance(obj, Portal)):
+            self.portals.add(obj)
+        elif (isinstance(obj, Planet)):
+            self.planets.add(obj)
+        elif (isinstance(obj, Asteroid)):
+            self.asteroids.add(obj)
+        elif (isinstance(obj, SpaceShip)):
+            self.ship = obj
+        elif (isinstance(obj, Object)):
+            self.objects.add(obj)
+
+    def remove_object(self, obj):
+        if (isinstance(obj, SimpleShoot)):
+            self.shoots.remove(obj)
+        elif (isinstance(obj, Portal)):
+            self.portals.remove(obj)
+        elif (isinstance(obj, Planet)):
+            self.planets.remove(obj)
+        elif (isinstance(obj, Asteroid)):
+            self.asteroids.remove(obj)
+        elif (isinstance(obj, SpaceShip)):
+            self.ship = None
+        elif (isinstance(obj, Object)):
+            self.objects.remove(obj)
+    
+    def all_objects(self):
+        return chain(
+            self.shoots, self.portals, self.planets,
+            self.asteroids, (self.ship,), self.objects
+        )
+    
     def load_file(self, level_name):
         lvl = yaml.load(open('resources/levels/' + level_name + '.lvl'))
 
@@ -60,6 +105,8 @@ class Level(object):
             models[name] = (gl_model, element)            
             
             file.close()
+        
+        self.dimensions = Vector3d(*lvl['scene']['dimensions'])
         
         poss = { }
         
@@ -87,7 +134,6 @@ class Level(object):
                 shape.rot_vel_xy = object['movement']['rot_velocity_xy']
                 shape.rot_vel_z = object['movement']['rot_velocity_z']
 
-                       
             shape.velocity_angular_x = rvel[0]
             shape.velocity_angular_y = rvel[1]
             shape.velocity_angular_z = rvel[2]
@@ -100,18 +146,19 @@ class Level(object):
                 'start_portal' : Portal,
                 'end_portal'   : Portal,
             }
-            
+                                    
             _object = type_class[type](model, shape, element)
             
-            self.objects.append(_object)
+            self.add_object(_object)
         
         self.make_spaceship(lvl, models)
+        self.make_guns(models)
 
     def make_spaceship(self, lvl, models):
         pos = None
         
-        for obj in self.objects:
-            if (isinstance(obj, Portal) and (obj.type == 'start')):
+        for obj in self.portals:
+            if (obj.type == 'start'):
                 pos = obj.shape.position
                 break
             
@@ -123,22 +170,28 @@ class Level(object):
 
         self.camera = Camera(self.ship, lvl['ship']['camera-dist'])
 
-        self.objects.append(self.ship)
+        self.add_object(self.ship)
+
+    def make_guns(self, models):
+        model = models['SimpleGun'][0]
+        self.ship.simple_gun = SimpleGun(model, self.ship, self)
 
     def draw(self):
         self.camera.put_in_position()
         
         self.draw_skybox(self.camera.pos)
 
-        for obj in self.objects:
+        for obj in self.all_objects():
             obj.draw()
     
     def tick(self, time_elapsed):
-        for obj in self.objects:
+        for obj in tuple(self.all_objects()):
             obj.tick(time_elapsed)
 
-        self.update_mouse_spin()
+        self.wrap_ship()
+        self.update_mouse_spin(time_elapsed)
         self.camera.tick(time_elapsed)
+        self.update_skybox(time_elapsed)
 
     def setup_skybox(self, image_path):
         self.skybox_textures = glGenTextures(6)
@@ -157,6 +210,13 @@ class Level(object):
                 0, GL_RGBA, GL_UNSIGNED_BYTE, img.bits().asstring(img.numBytes()))
             
             glBindTexture(GL_TEXTURE_2D, 0)
+        
+        self.sky_angles = [uniform(-180.,180.) for i in xrange(3)]
+        self.sky_angles_vel = [uniform(-0.5,0.5) for i in xrange(3)]
+
+    def update_skybox(self, time_elapsed):
+        for i in xrange(3):
+            self.sky_angles[i] += self.sky_angles_vel[i] * time_elapsed
 
     def draw_skybox(self, pos):
         if (pos is None):
@@ -165,7 +225,11 @@ class Level(object):
         glMatrixMode(GL_MODELVIEW)
         glPushMatrix()
         
-        glTranslated(pos.x,pos.y,pos.z)
+        glTranslate(pos.x,pos.y,pos.z)
+        
+        for i in xrange(3):
+            l = [0.,0.,0.]; l[i] = 1.
+            glRotate(self.sky_angles[i], *l)
 
         glPushAttrib(GL_ENABLE_BIT)
         glEnable(GL_TEXTURE_2D)
@@ -241,10 +305,6 @@ class Level(object):
             self.controller.pop_screen(self)
         elif (k == Qt.Key_W):
             self.ship.move_forward()
-        elif (k == Qt.Key_A):
-            self.ship.move_left()
-        elif (k == Qt.Key_D):
-            self.ship.move_right()
         elif (k == Qt.Key_Up):
             self.ship.spin('up', True)
         elif (k == Qt.Key_Down):
@@ -253,10 +313,20 @@ class Level(object):
             self.ship.spin('left', True)
         elif (k == Qt.Key_Right):
             self.ship.spin('right', True)
+        elif (k == Qt.Key_A):
+            self.ship.strafing('left',True)
+        elif (k == Qt.Key_D):
+            self.ship.strafing('right',True)
         elif (k == Qt.Key_B):
             self.camera.invert()
+        elif (k == Qt.Key_Space):
+            if (not event.isAutoRepeat()):
+                self.ship.simple_gun.start_shoot()
 
     def keyReleaseEvent(self, event):
+        if (event.isAutoRepeat()):
+            return
+        
         k = event.key()
 
         if (k == Qt.Key_Up):
@@ -267,10 +337,29 @@ class Level(object):
             self.ship.spin('left', False)
         elif (k == Qt.Key_Right):
             self.ship.spin('right', False)
+        elif (k == Qt.Key_A):
+            self.ship.strafing('left',False)
+        elif (k == Qt.Key_D):
+            self.ship.strafing('right',False)
         elif (k == Qt.Key_B):
             self.camera.invert()
+        elif (k == Qt.Key_Space):
+            if (not event.isAutoRepeat()):
+                self.ship.simple_gun.end_shoot()
 
-    def update_mouse_spin(self):
+    def mousePressEvent(self, event):
+        b = event.button()
+        
+        if (b == Qt.LeftButton):
+            self.ship.simple_gun.start_shoot()
+    
+    def mouseReleaseEvent(self, event):
+        b = event.button()
+        
+        if (b == Qt.LeftButton):
+            self.ship.simple_gun.end_shoot()
+
+    def update_mouse_spin(self, time_elapsed):
         if (self.controller is None):
             return
 
@@ -281,4 +370,23 @@ class Level(object):
 
         self.controller.cursor().setPos(*m_center)
 
-        self.ship.mouse_spin(x-m_center[0], y-m_center[1])
+        self.ship.mouse_spin(x-m_center[0], y-m_center[1], time_elapsed)
+
+    def wrap_ship(self):
+        pos = self.ship.shape.position
+        dx, dy, dz = map(lambda x : x / 2., self.dimensions)
+        
+        if (pos.x > dx):
+            pos.x = (-dx) + (pos.x - dx)
+        elif (pos.x < -dx):
+            pos.x = dx + (pos.x - dx)
+            
+        if (pos.y > dy):
+            pos.y = (-dy) + (pos.y - dy)
+        elif (pos.y < -dy):
+            pos.y = dy + (pos.y - dy)            
+            
+        if (pos.z > dz):
+            pos.z = (-dz) + (pos.z - dz)
+        elif (pos.z < -dz):
+            pos.z = dz + (pos.z - dz)

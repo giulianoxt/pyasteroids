@@ -35,7 +35,7 @@ class Quaternion(object):
         qy = Quaternion.from_axis_angle(v3d(0.,1.,0.),ry)
         qz = Quaternion.from_axis_angle(v3d(0.,0.,1.),rz)
         
-        return (qx * qy * qz)
+        return qx * (qy * qz)
     
     def normalize(self):
         mag = self.w**2 + self.x**2 + self.y**2 + self.z**2
@@ -58,10 +58,14 @@ class Quaternion(object):
         
             return (a, degrees(acos(self.w) * 2.))
         except ZeroDivisionError:
-            return (v3d(0.,0.,0.), 0.)
+            return (v3d(1.,0.,0.), 0.)
     
     def __mul__(self, q):
+        self.normalize()
+        
         if (isinstance(q, Quaternion)):
+            q.normalize()
+            
             r = Quaternion()
         
             r.w = self.w*q.w - self.x*q.x - self.y*q.y - self.z*q.z
@@ -86,44 +90,30 @@ class Quaternion(object):
             
             return Vector3d(res_quat.x, res_quat.y, res_quat.z)
 
-    def get_matrix(self, mat):
-        self.normalize()
-        
-        if (mat is None):
-            mat = [None]*16
-        
-        X, Y, Z, W = self.x, self.y, self.z, self.w
-        
-        xx = X * X
-        xy = X * Y
-        xz = X * Z
-        xw = X * W
 
-        yy = Y * Y
-        yz = Y * Z
-        yw = Y * W
+if (__name__ == '__main__'):    
+    # 90 pra cima (0,1,0)
+    rx = Quaternion.from_axis_angle(v3d(1.,0.,0.), 90.)
+    print '1', rx * v3d(0.,0.,-1.)
 
-        zz = Z * Z
-        zw = Z * W
+    # 90 pra esquerda (-1,0,0)
+    ry = Quaternion.from_axis_angle(v3d(0.,1.,0.), 90.) 
+    print '2', ry * v3d(0.,0.,-1.)
 
-        mat[0]  = 1 - 2 * ( yy + zz )
-        mat[1]  =     2 * ( xy - zw )
-        mat[2]  =     2 * ( xz + yw )
-
-        mat[4]  =     2 * ( xy + zw )
-        mat[5]  = 1 - 2 * ( xx + zz )
-        mat[6]  =     2 * ( yz - xw )
-
-        mat[8]  =     2 * ( xz - yw )
-        mat[9]  =     2 * ( yz + xw )
-        mat[10] = 1 - 2 * ( xx + yy )
-
-        mat[3] = 0.
-        mat[7] = 0.
-        mat[11] = 0.
-        mat[12] = 0.
-        mat[13] = 0.
-        mat[14] = 0.
-        mat[15] = 1.
-
-        return mat
+    # caso nao translade o sistema de coordenadas, vai ser: (0,1,0)
+    v1 = rx * v3d(0.,0.,-1.)
+    v2 = ry * v1
+    print '3', v2
+    
+    # caso translade o sistema de coordenadas, vai ser: (-1,0,0) 
+    rxy = rx * ry
+    print '4', rxy * v3d(0.,0.,-1.)
+    
+    # caso nao translade o sistema de coordenadas, vai ser: (-1,0,0) 
+    v1 = ry * v3d(0.,0.,-1.)
+    v2 = rx * v1
+    print '5', v2
+    
+    # caso translade o sistema de coordenadas, vai ser: (0,1,0)
+    ryx = ry * rx
+    print '6', ryx * v3d(0.,0.,-1.)

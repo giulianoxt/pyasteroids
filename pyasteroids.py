@@ -19,13 +19,13 @@ def start_pyasteroids():
         print 'It is highly advisable to install it for a much better gaming performance.'
         print 'Official site: http://psyco.sourceforge.net/'
 
-    # Load the config files in memory
+    # Load the config files in memory'
     ConfigManager()
 
     app = QApplication(argv)
 
     # Creates the window (GLWidget is created there)
-    win = AsteroidsMainWindow() 
+    win = AsteroidsMainWindow()
 
     # Pop-up the window    
     win.show()

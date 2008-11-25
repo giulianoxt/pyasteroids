@@ -3,12 +3,17 @@
     as a OpenGL polygon mesh
 """
 
+from math import sqrt
+
 from OpenGL.GL import *
 
 from PyQt4.QtGui import QImage
 from PyQt4.QtOpenGL import QGLWidget
 
 from model.ply import PLYModel
+
+from physics.vector3d import Vector3d
+from physics.collision import BoundingSphere
 
 
 class GLModel(object):
@@ -23,6 +28,8 @@ class GLModel(object):
         
         if ('material' in self.ply and 'material_index' in self.ply['face'][0]):
             self.generate_textures()      
+    
+        self.sphere = BoundingSphere()
     
         self.make_display_list(translate, rotate, scale)
     
@@ -69,6 +76,9 @@ class GLModel(object):
         for ((x,y,z),a) in zip(((1.,0.,0.), (0.,1.,0.), (0.,0.,1.)), rotate):
             glRotatef(a,x,y,z)
         
+        self.scale = scale
+        self.offset = translate
+        
         glScalef(*([scale]*3))
         
         self.direct_draw()
@@ -92,6 +102,8 @@ class GLModel(object):
         def has_texture(face):
             return (textures and textures[f['material_index']])
         
+        max_x, max_y, max_z = 0., 0., 0.
+        
         for f in faces:
             ht = has_texture(f)
             
@@ -112,11 +124,25 @@ class GLModel(object):
                     glTexCoord2f(v['s'],v['t'])
 
                 glVertex3f(v['x'],v['y'],v['z'])
+                
+                if (v['x'] > max_x):
+                    max_x = v['x']
+                if (v['y'] > max_y):
+                    max_y = v['y']
+                if (v['z'] > max_z):
+                    max_z = v['z']
             
             glEnd()
             
             if (ht):
                 glBindTexture(GL_TEXTURE_2D, 0)
+    
+        max_x = (max_x + self.offset[0]) * self.scale
+        max_y = (max_y + self.offset[1]) * self.scale
+        max_z = (max_z + self.offset[2]) * self.scale
+        
+        self.sphere.center = Vector3d(0.,0.,0.)
+        self.sphere.radius = sqrt(max_x**2 + max_y**2 + max_z**2)
     
     def draw(self):
         glMatrixMode(GL_MODELVIEW)

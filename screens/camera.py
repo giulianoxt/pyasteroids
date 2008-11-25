@@ -33,8 +33,6 @@ class Camera(object):
         self.look = self.ship.shape.position + ship_dir
         self.up = up_dir
         
-        light_pos = self.ship.shape.position + oposite.scalar(400)
-        
     def put_in_position(self):
         if (self.pos is None):
             return
