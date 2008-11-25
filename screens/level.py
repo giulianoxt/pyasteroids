@@ -189,7 +189,7 @@ class Level(object):
             obj.tick(time_elapsed)
 
         self.wrap_ship()
-        #self.update_mouse_spin(time_elapsed)
+        self.update_mouse_spin(time_elapsed)
         self.camera.tick(time_elapsed)
         #self.update_skybox(time_elapsed)
 
@@ -313,10 +313,10 @@ class Level(object):
             self.ship.spin('left', True)
         elif (k == Qt.Key_Right):
             self.ship.spin('right', True)
-        #elif (k == Qt.Key_A):
-        #    self.ship.strafing('left',True)
-        #elif (k == Qt.Key_D):
-        #    self.ship.strafing('right',True)
+        elif (k == Qt.Key_A):
+            self.ship.strafing('left',True)
+        elif (k == Qt.Key_D):
+            self.ship.strafing('right',True)
         elif (k == Qt.Key_B):
             if (not event.isAutoRepeat()):
                 self.camera.invert()
@@ -340,10 +340,10 @@ class Level(object):
             self.ship.spin('left', False)
         elif (k == Qt.Key_Right):
             self.ship.spin('right', False)
-        #elif (k == Qt.Key_A):
-        #    self.ship.strafing('left',False)
-        #elif (k == Qt.Key_D):
-        #    self.ship.strafing('right',False)
+        elif (k == Qt.Key_A):
+            self.ship.strafing('left',False)
+        elif (k == Qt.Key_D):
+            self.ship.strafing('right',False)
         elif (k == Qt.Key_B):
             if (not event.isAutoRepeat()):
                 self.camera.invert()
