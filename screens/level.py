@@ -129,7 +129,7 @@ class Level(object):
                 
                 shape = Shape(mass, pos)	       	
             elif (movement == 'orbit'):
-                shape = Shape(mass, poss[object['movement']['center_planet_name']])
+                shape = Shape(mass, Vector3d(*poss[object['movement']['center_planet_name']]))
                 shape.rotation_radius = object['movement']['radius']
                 shape.rot_vel_xy = object['movement']['rot_velocity_xy']
                 shape.rot_vel_z = object['movement']['rot_velocity_z']
