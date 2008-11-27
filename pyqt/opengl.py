@@ -98,6 +98,7 @@ class GLController(QGLWidget):
         # if we run out of screens, the game is over
         if (not len(self.screen_stack)):
             self.parent().close()
+            self.painter.end()
             return
         
         self.screen_stack[-1].draw()

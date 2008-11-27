@@ -22,9 +22,16 @@ class Interface(object):
             img = QImage('resources/images/'+s[0])
             img_pos = QPoint(*eval(s[1]))
             info_rect = QRect(*eval(s[2]))
+            scale = float(s[3])
+            
+            img_w, img_h = img.width(), img.height()
+            img_rect = QRect(
+                img_pos.x(), img_pos.y(),
+                int(img_w*scale), int(img_h*scale)
+            )
             
             self.info[f_name] = ''
-            self.fields.add(Field(f_name, img, img_pos, info_rect))
+            self.fields.add(Field(f_name, img, img_rect, info_rect))
 
     def tick(self, time_elapsed):
         self.controller.tick_parent(self, time_elapsed)
@@ -45,23 +52,23 @@ class Interface(object):
         glLoadIdentity()
         
         for field in self.fields:
-            field.draw(self.qpainter, None, QColor.fromRgb(255,255,255), None)
+            field.draw(self.qpainter, None, QColor.fromRgb(255,255,255,100), None)
 
 class Field(object):
     flags = Qt.AlignVCenter | Qt.AlignHCenter
     
-    def __init__(self, name, img, pos, rect):
+    def __init__(self, name, img, img_rect, info_rect):
         self.name = name
         self.img = img
-        self.pos = pos
-        self.rect = rect
+        self.img_rect = img_rect
+        self.info_rect = info_rect
         
     def draw(self, painter, font, color, info):
-        painter.drawImage(self.pos, self.img)
+        painter.drawImage(self.img_rect, self.img)
         
         #painter.setFont(font)
         #painter.setPen(color)
         #painter.drawText(self.rect, Field.flags, info)
 
         painter.setPen(color)
-        painter.fillRect(self.rect, color)
+        painter.fillRect(self.info_rect, color)

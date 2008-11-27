@@ -10,15 +10,6 @@ from util.config import ConfigManager, FontManager
 def start_pyasteroids():
     random.seed()
     
-    # Faster processing
-    try:
-        import psyco
-        psyco.full()
-    except:
-        print 'You currently do not have the Psyco module in your PYTHONPATH.'
-        print 'It is highly advisable to install it for a much better gaming performance.'
-        print 'Official site: http://psyco.sourceforge.net/'
-
     app = QApplication(argv)
     
     # Load the config files in memory 
@@ -32,6 +23,15 @@ def start_pyasteroids():
 
     # Pop-up the window    
     win.show()
+
+    # Faster processing
+    try:
+        import psyco
+        psyco.full()
+    except:
+        print 'You currently do not have the Psyco module in your PYTHONPATH.'
+        print 'It is highly advisable to install it for a much better gaming performance.'
+        print 'Official site: http://psyco.sourceforge.net/'
 
     # Gives control to Qt
     app.exec_()
