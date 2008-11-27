@@ -7,12 +7,12 @@ from OpenGL.GLU import *
 
 from PyQt4 import QtCore
 from PyQt4.QtOpenGL import QGLWidget
-from PyQt4.QtGui import QCursor, QPixmap
 from PyQt4.QtCore import Qt, QTimer, QObject
+from PyQt4.QtGui import QCursor, QPixmap, QPainter
 
 import screens
 from util.config import Config
-from util.opengl import setup_perspective
+from util.opengl import default_perspective
 
 class GLController(QGLWidget):
     def __init__(self, parent):
@@ -22,6 +22,8 @@ class GLController(QGLWidget):
         
         self.fps = cfg.get('fps')
         self.clearColor = cfg.get('clear_color')
+        
+        self.painter = QPainter()
         
         self.adjust_widget()
         self.adjust_timer()
@@ -76,12 +78,18 @@ class GLController(QGLWidget):
 
     def resizeGL(self, width, height):
         QGLWidget.resizeGL(self,width,height)
+        default_perspective(width, height)
         
-        setup_perspective(width, height)
-        
-        self.mouse_center = (width/2, height/2)
+        self.mouse_center = (width / 2, height / 2)
 
     def paintGL(self):
+        glPushAttrib(GL_ALL_ATTRIB_BITS)
+        self.painter.begin(self)
+        self.painter.setRenderHint(QPainter.Antialiasing)
+        self.painter.setRenderHint(QPainter.TextAntialiasing)
+        self.painter.setRenderHint(QPainter.SmoothPixmapTransform)
+        glPopAttrib()
+        
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
         
@@ -93,6 +101,8 @@ class GLController(QGLWidget):
             return
         
         self.screen_stack[-1].draw()
+        
+        self.painter.end()
     
     def tick(self):
         new_time = time()
@@ -101,7 +111,7 @@ class GLController(QGLWidget):
         
         self.fps = 1 / elapsed
         
-        #print 'fps =', self.fps
+        print 'fps =', self.fps
         
         # if we run out of screens, the game is over
         if (not len(self.screen_stack)):
@@ -111,6 +121,16 @@ class GLController(QGLWidget):
         self.screen_stack[-1].tick(elapsed)
         
         self.updateGL()
+
+    def get_parent_screen(self, screen):
+        i = self.screen_stack.index(screen)
+        return self.screen_stack[i-1]
+
+    def tick_parent(self, screen, time_elapsed):
+        self.get_parent_screen(screen).tick(time_elapsed)
+    
+    def draw_parent(self, screen):
+        self.get_parent_screen(screen).draw()
 
     def pop_screen(self, screen):
         # erases that screen and all above it
@@ -150,6 +170,9 @@ class GLController(QGLWidget):
         # include a reference to this controller
         new_screen.controller = self
         
+        # and to his painter
+        new_screen.qpainter = self.painter
+        
         # finally, push it
         self.screen_stack.append(new_screen)
 
@@ -168,14 +191,11 @@ class GLController(QGLWidget):
     def mouseReleaseEvent(self, mouseEvent):
         self.send_generic_event('mouseReleaseEvent', mouseEvent)
 
-    def send_generic_event(self, event_name, event_arg):
-        if (not len(self.screen_stack)):
-            return
-        
-        screen = self.screen_stack[-1]
-        
-        if (hasattr(screen, event_name)):
-            getattr(screen, event_name)(event_arg)
+    def send_generic_event(self, event_name, event_arg):        
+        for screen in reversed(self.screen_stack):
+            if (hasattr(screen, event_name)):
+                getattr(screen, event_name)(event_arg)
+                return
     
     def mouse_pos(self):
         return self.mapFromGlobal(QCursor.pos())

@@ -11,6 +11,7 @@ from PyQt4.QtGui import QImage
 from PyQt4.QtOpenGL import QGLWidget
 
 from util.config import Config
+from util.opengl import default_perspective
 
 from physics.shape import Shape
 from model.opengl import GLModel
@@ -46,7 +47,7 @@ class Level(object):
         self.load_file(level_name)
         
         skybox = cfg.get('skybox')
-        #self.setup_skybox('resources/'+skybox)
+        self.setup_skybox('resources/'+skybox)
     
     def add_object(self, obj):
         if (isinstance(obj, SimpleShoot)):
@@ -133,8 +134,8 @@ class Level(object):
                 shape.rotation_radius = object['movement']['radius']
                 shape.rot_vel_xy = object['movement']['rot_velocity_xy']
                 shape.rot_vel_z = object['movement']['rot_velocity_z']
-		shape.rot_xy = object['movement']['rot_xy']
-		shape.rot_z = object['movement']['rot_z']
+                shape.rot_xy = object['movement']['rot_xy']
+                shape.rot_z = object['movement']['rot_z']
 
             shape.velocity_angular_x = rvel[0]
             shape.velocity_angular_y = rvel[1]
@@ -179,9 +180,11 @@ class Level(object):
         self.ship.simple_gun = SimpleGun(model, self.ship, self)
 
     def draw(self):
+        default_perspective(self.controller.width(), self.controller.height())
+        
         self.camera.put_in_position()
         
-        #self.draw_skybox(self.camera.pos)
+        self.draw_skybox(self.camera.pos)
 
         for obj in self.all_objects():
             obj.draw()
@@ -193,7 +196,7 @@ class Level(object):
         self.wrap_ship()
         self.update_mouse_spin(time_elapsed)
         self.camera.tick(time_elapsed)
-        #self.update_skybox(time_elapsed)
+        self.update_skybox(time_elapsed)
 
     def setup_skybox(self, image_path):
         self.skybox_textures = glGenTextures(6)
@@ -362,7 +365,7 @@ class Level(object):
             self.ship.simple_gun.start_shoot()
         else:
             event.ignore()
-    
+
     def mouseReleaseEvent(self, event):
         b = event.button()
         

@@ -3,8 +3,8 @@ import random
 from sys import argv
 from PyQt4.QtGui import QApplication
 
-from util.config import ConfigManager
 from pyqt.main_window import AsteroidsMainWindow
+from util.config import ConfigManager, FontManager
 
 
 def start_pyasteroids():
@@ -19,10 +19,13 @@ def start_pyasteroids():
         print 'It is highly advisable to install it for a much better gaming performance.'
         print 'Official site: http://psyco.sourceforge.net/'
 
-    # Load the config files in memory'
-    ConfigManager()
-
     app = QApplication(argv)
+    
+    # Load the config files in memory 
+    ConfigManager()
+    
+    # Add the custom fonts to the Qt database
+    FontManager()
 
     # Creates the window (GLWidget is created there)
     win = AsteroidsMainWindow()

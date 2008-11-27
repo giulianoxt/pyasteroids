@@ -11,3 +11,4 @@ class Intro(object):
     def tick(self, time_elapsed):
         self.controller.pop_screen(self)
         self.controller.push_screen('Level', 1)
+        self.controller.push_screen('Interface', 1)

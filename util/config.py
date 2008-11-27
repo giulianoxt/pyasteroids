@@ -2,6 +2,7 @@ import os
 
 from ConfigParser import ConfigParser
 
+from PyQt4.QtGui import QFont, QFontDatabase
 
 _config_dir = os.path.join('resources','config')
 
@@ -71,3 +72,25 @@ class Config(object):
     def set(self, key, val):
         ConfigManager.setVal(self.file, self.section, key, str(val))
 
+
+class FontManager(object):
+    instance = None
+
+    def __init__(self):
+        if (FontManager.instance is None):
+            FontManager.instance = self
+        
+        self.fonts = {}
+        
+        for font_name in ConfigManager.getOptions('interface','Fonts'):
+            tmp = ConfigManager.getVal('interface','Fonts',font_name)
+            path, family = tuple(map(str.strip,tmp.split('||'))) 
+
+            QFontDatabase.addApplicationFont('resources/fonts/' + path)
+
+            self.fonts[font_name] = QFont(family)
+    
+    @classmethod
+    def getFont(cls, font_name):
+        fm = FontManager.instance
+        return QFont(fm.fonts[font_name])
