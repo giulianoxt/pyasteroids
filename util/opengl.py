@@ -16,8 +16,13 @@ def default_perspective(width, height):
         
     gluPerspective(_fovy,float(width)/height,_z_near,_z_far)
     
-def ortho_projection(width, height):
-    glViewport(0,0,width,height)
+    glMatrixMode(GL_MODELVIEW)
+    glLoadIdentity()
+    
+    glClear(GL_DEPTH_BUFFER_BIT)
+
+def custom_ortho_projection(x, y, width, height):
+    glViewport(x,y,width,height)
     
     glMatrixMode(GL_PROJECTION)
     glLoadIdentity()
@@ -25,3 +30,11 @@ def ortho_projection(width, height):
     w, h = map(int, (width, height))
     
     gluOrtho2D(0.,w,h,0.)
+
+    glMatrixMode(GL_MODELVIEW)
+    glLoadIdentity()
+    
+    glClear(GL_DEPTH_BUFFER_BIT)
+    
+def ortho_projection(width, height):
+    custom_ortho_projection(0, 0, width, height)
