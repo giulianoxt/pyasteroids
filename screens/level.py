@@ -47,7 +47,7 @@ class Level(object):
         self.load_file(level_name)
         
         skybox = cfg.get('skybox')
-        self.setup_skybox('resources/'+skybox)
+        #self.setup_skybox('resources/'+skybox)
     
     def add_object(self, obj):
         if (isinstance(obj, SimpleShoot)):
@@ -189,7 +189,7 @@ class Level(object):
         
         self.camera.put_in_position()
         
-        self.draw_skybox(self.camera.pos)
+        #self.draw_skybox(self.camera.pos)
 
         for obj in self.all_objects():
             obj.draw()
@@ -201,7 +201,7 @@ class Level(object):
         self.wrap_ship()
         self.update_mouse_spin(time_elapsed)
         self.camera.tick(time_elapsed)
-        self.update_skybox(time_elapsed)
+        #self.update_skybox(time_elapsed)
 
     def setup_skybox(self, image_path):
         self.skybox_textures = glGenTextures(6)
@@ -210,8 +210,8 @@ class Level(object):
         for (tex_id, side) in zip(self.skybox_textures, sides):  
             glBindTexture(GL_TEXTURE_2D, tex_id)
         
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
         
             img = QImage(image_path+'-'+side+'.png')
             img = QGLWidget.convertToGLFormat(img)
