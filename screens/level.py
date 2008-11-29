@@ -109,7 +109,14 @@ class Level(object):
         
         self.dimensions = Vector3d(*lvl['scene']['dimensions'])
         
-        poss = { }
+        type_class = {
+            'planet'       : Planet,
+            'asteroid'     : Asteroid,
+            'start_portal' : Portal,
+            'end_portal'   : Portal,
+        }
+        
+        id_table = { }
         
         for object in lvl['scene']['objects']:
             element_name = object['element']
@@ -126,11 +133,13 @@ class Level(object):
 
             if (movement == 'static'):
                 pos = Vector3d(*object['pos'])
-                poss[element_name] = pos 
-                
                 shape = Shape(mass, pos)	       	
             elif (movement == 'orbit'):
-                shape = Shape(mass, Vector3d(*poss[object['movement']['center_planet_name']]))
+                center_id = object['movement']['center_planet_id']
+                center_obj = id_table[center_id]
+                center_pos = Vector3d(*center_obj.shape.position)
+                
+                shape = Shape(mass, center_pos)
                 shape.rotation_radius = object['movement']['radius']
                 shape.rot_vel_xy = object['movement']['rot_velocity_xy']
                 shape.rot_vel_z = object['movement']['rot_velocity_z']
@@ -142,17 +151,13 @@ class Level(object):
             shape.velocity_angular_z = rvel[2]
                        
             type = element['type']
-            
-            type_class = {
-                'planet'       : Planet,
-                'asteroid'     : Asteroid,
-                'start_portal' : Portal,
-                'end_portal'   : Portal,
-            }
                                     
             _object = type_class[type](model, shape, element)
             
             self.add_object(_object)
+            
+            if ('id' in object):
+                id_table[object['id']] = _object
         
         self.make_spaceship(lvl, models)
         self.make_guns(models)

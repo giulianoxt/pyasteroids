@@ -21,15 +21,16 @@ def default_perspective(width, height):
     
     glClear(GL_DEPTH_BUFFER_BIT)
 
-def custom_ortho_projection(x, y, width, height):
-    glViewport(x,y,width,height)
+def custom_ortho_projection(x, y, left, right, bottom, top):
+    w = abs(left - right)
+    h = abs(top - bottom)
+    
+    glViewport(x,y,w,h)
     
     glMatrixMode(GL_PROJECTION)
     glLoadIdentity()
     
-    w, h = map(int, (width, height))
-    
-    gluOrtho2D(0.,w,h,0.)
+    gluOrtho2D(left,right,bottom,top)
 
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
@@ -37,4 +38,4 @@ def custom_ortho_projection(x, y, width, height):
     glClear(GL_DEPTH_BUFFER_BIT)
     
 def ortho_projection(width, height):
-    custom_ortho_projection(0, 0, width, height)
+    custom_ortho_projection(0, 0, 0, width, height, 0)

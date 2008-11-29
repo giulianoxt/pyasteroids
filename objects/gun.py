@@ -41,7 +41,7 @@ class SimpleGun(object):
             return
 
         self.shooting = True
-        #self.single_shoot()
+        self.single_shoot()
         self.since_last_shoot = 0.0
     
     def end_shoot(self):

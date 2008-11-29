@@ -133,6 +133,9 @@ class GLController(QGLWidget):
     def draw_parent(self, screen):
         self.get_parent_screen(screen).draw()
 
+    def top_screen(self):
+        return self.screen_stack[-1]
+
     def pop_screen(self, screen):
         # erases that screen and all above it
         i = self.screen_stack.index(screen)

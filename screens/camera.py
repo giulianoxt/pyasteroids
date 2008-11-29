@@ -1,9 +1,10 @@
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
-from physics.vector3d import Vector3d
+from util.deque import Deque
+from util.config import Config
 
-v3d = Vector3d
+from physics.vector3d import Vector3d as v3d
 
 
 class Camera(object):
@@ -17,22 +18,49 @@ class Camera(object):
 
         self.s = -1.
 
+        self.buffer = Deque() # (ship_dir,up_dir) pairs
+
         self.recalculate_vectors()
             
     def recalculate_vectors(self):
         if (self.ship.ship_dir is None):
             return
         
-        ship_dir = self.ship.ship_dir
-        up_dir = self.ship.up_dir
+        if (len(self.buffer) == 0):
+            self.init_buffer()
+        
+        position = self.ship.shape.position
+        ship_dir, up_dir = self.update_buffer(self.ship)
         
         oposite = ship_dir.scalar(self.s)
         oposite = oposite.scalar(self.dist)
 
-        self.pos = self.ship.shape.position + oposite
-        self.look = self.ship.shape.position + ship_dir
+        self.pos = position + oposite
+        self.look = position + ship_dir
         self.up = up_dir
+    
+    def init_buffer(self):
+        sz = Config('game', 'OpenGL').get('camera_buffer_size')
+            
+        t = (
+             v3d(*self.ship.ship_dir),
+             v3d(*self.ship.up_dir)
+        )
+            
+        for i in xrange(sz):
+            self.buffer.push_back(t)
+    
+    def update_buffer(self, ship):
+        t = (
+             v3d(*ship.ship_dir),
+             v3d(*ship.up_dir)
+        )
         
+        obj = self.buffer.pop_front()
+        self.buffer.push_back(t)
+        
+        return obj
+    
     def put_in_position(self):
         if (self.pos is None):
             return

@@ -24,7 +24,7 @@ elements:
                         # Caminho para o modelo deste elemento (partindo de resources/models)
                         file: planets/io.ply
                         # Aplica esse scale antes de desenhar [opcional]
-                        scale: 4
+                        scale: 8
                         rotate: [0,0,0]
                         translate: [0,0,0]
 
@@ -141,12 +141,12 @@ scene:
 
                 -
                         element: Io
-                        rotation_velocity: [180,180,180]
+                        rotation_velocity: [180,0,0]
 
                         movement:
                                 type: orbit
                                 # Id do objeto central da órbita
-                                center_planet_name: Neptune
+                                center_planet_id: 1
                                 radius: 120
                                 rot_xy: 0.0
                                 rot_z: 0.1122
@@ -158,12 +158,12 @@ scene:
 
                 -
                         element: Io
-                        rotation_velocity: [180,180,180]
+                        rotation_velocity: [0,180,0]
 
                         movement:
                                 type: orbit
                                 # Id do objeto central da órbita
-                                center_planet_name: Neptune
+                                center_planet_id: 1
                                 radius: 130
                                 rot_xy: 0.0
                                 rot_z: 1.5
@@ -177,4 +177,4 @@ scene:
 ship:
         model: Simple-Spaceship
         mass: 50
-        camera-dist: 10
+        camera-dist: 13

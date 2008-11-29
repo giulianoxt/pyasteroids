@@ -51,6 +51,9 @@ class Vector3d:
 	def __repr__(self):
 		return str(self)
 	
+	def __getitem__(self, i):
+		return (self.x, self.y, self.z)[i]
+	
 	# cross product
 	def cross_product(self, vec3d):
 		x_cp = self.y*vec3d.z - self.z*vec3d.y
