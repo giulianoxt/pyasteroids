@@ -265,6 +265,9 @@ class Radar(FrameView):
         
         ast = self.level.asteroids
         plnt = self.level.planets
+        shots = self.level.shots
+        missiles = self.level.missiles
+        portals = self.level.portals
 
         pos = self.level.ship.shape.position
         ship_x, ship_y = self.convert_to_local(pos)
@@ -284,9 +287,17 @@ class Radar(FrameView):
         glTranslatef(-ship_x,-ship_y,0.)
         
         for obj in chain(ast,plnt):
-            x, y = self.convert_to_local(obj.shape.position)
-            
-            self.draw_square(x, y, 5, (1., 0., 0.))
+            c = (1.,0.,0.) if obj.target else (0.,0.,1.)
+            self.draw_square(obj.shape.position, 5, c)
+        
+        for obj in portals:
+            self.draw_square(obj.shape.position, 5, (0.,1.,0.))
+        
+        for obj in shots:
+            self.draw_square(obj.shape.position, 1.5, (1.,1.,1.))
+        
+        for obj in missiles:
+            self.draw_square(obj.shape.position, 3, (.8,.8,.8))
             
         glPopMatrix()
 
@@ -297,7 +308,9 @@ class Radar(FrameView):
             -self.view_h2, self.view_h2
         )
 
-    def draw_square(self, x, y, s, c):
+    def draw_square(self, pos, s, c):
+        x, y = self.convert_to_local(pos)
+        
         s = s / 2.
         
         glColor3f(*c)
