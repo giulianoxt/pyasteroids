@@ -1,7 +1,9 @@
 from math import *
+from itertools import chain
 
 from physics.vector3d import Vector3d 
 
+_eps = 1e-2
 
 class Shape:
 	def __init__(self, mass = 0.0, pos = Vector3d(0.,0.,0.)):
@@ -35,6 +37,8 @@ class Shape:
 		# resistence force
 		# positive real values list 
 		self.forces_res = []
+		
+		self.forces_res_tmp = []
 
 	def calculate_rotation(self, delta):
 		if (self.rotation_radius is None):
@@ -47,31 +51,31 @@ class Shape:
 		self.position.z = self.rotation_center.z + self.rotation_radius*cos(self.rot_z)	
 		
 	def calculate_aceleration(self):
-
-		self.aceleration = Vector3d(0.0, 0.0, 0.0)
-		total_forces = self.forces + self.forces_tmp
+		self.aceleration = sum(chain(self.forces, self.forces_tmp), Vector3d(0.,0.,0.))
 		
-		for f in total_forces :
-			self.aceleration = self.aceleration + f
+		f_res = sum(chain(self.forces_res, self.forces_res_tmp), 0.)
+		
+		if (f_res >= 1.0):
+			f_res = 1.0
 		
 		# clear temporary forces
 		self.forces_tmp = []
+		self.forces_res_tmp = []
 		
-		f_res = 0.0
+		v = self.velocity.get_mod()
+		res_mod = v * f_res
 		
-		for f in self.forces_res:
-			f_res += f
+		self.aceleration = self.aceleration.scalar(1.0 / self.mass)
+		self.aceleration = self.aceleration + self.velocity.normalizing().scalar(-res_mod)
 		
-		if (f_res > self.aceleration.get_mod()):
-			self.aceleration.x = 0.
-			self.aceleration.y = 0.
-			self.aceleration.z = 0.
-		else:
-			self.aceleration = self.aceleration + self.aceleration.normalizing().scalar(-f_res)
-			self.aceleration = self.aceleration.scalar(1.0/self.mass)
+		if (self.aceleration.get_mod() <= _eps):
+			self.aceleration = Vector3d(0.,0.,0.)
 		
 	def calculate_velocity(self, delta):
 		self.velocity = self.velocity + self.aceleration.scalar(delta)
+		
+		if (self.velocity.get_mod() <= _eps):
+			self.velocity = Vector3d(0.,0.,0.)
 		
 	def calculate_position(self, delta):
 		self.position = self.position + self.velocity.scalar(delta)
@@ -87,3 +91,10 @@ class Shape:
 		self.calculate_velocity(delta)
 		self.calculate_position(delta)
 		self.calculate_angle(delta)
+
+
+try:
+	import psyco
+	psyco.bind(Shape)
+except:
+	pass

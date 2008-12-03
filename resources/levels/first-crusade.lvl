@@ -7,6 +7,8 @@
 # Título do level
 name: First crusade
 
+time: 5.5
+
 
 # Elementos básicos presentes no level. O usuário escolhe no editor
 # e adiciona pro level que ele tá montando
@@ -27,14 +29,19 @@ elements:
                         scale: 8
                         rotate: [0,0,0]
                         translate: [0,0,0]
+                        radius_correction: -11.5
 
                 # Indica se os tiros afetam esse elemento
                 destructible: yes
                 # Life do elemento, só aparece se destructible = yes
-                hp: 10000
+                hp: 1000
+                score: 125
 
                 # Indica se uma colisao com a nave tira hp da nave
                 destroys_player: yes
+                damage: 200
+
+                target: yes
 
         -
                 name: Neptune
@@ -46,11 +53,15 @@ elements:
                         file: planets/neptune.ply
                         scale: 45
                         rotate: [0,0,0]
-                        translate: [0,0,0]                        
+                        translate: [0,0,0]
+                        radius_correction: -65                      
 
                 destructible: no
 
                 destroys_player: yes
+                damage: 1000
+                
+                target: no
 
         -
                 name: Begin
@@ -63,10 +74,15 @@ elements:
                         file: portals/simple-portal.ply
                         scale: 8
                         rotate: [0,0,0]
-                        translate: [0,0,0]                        
+                        translate: [0,0,0]
+                        radius_correction: -3.5                     
 
                 destructible: no
+                
                 destroys_player: no
+                
+                target: no
+                
 
         -
                 name: Simple-Spaceship
@@ -77,12 +93,19 @@ elements:
                 model:
                         file: combat-ship/combat-ship.ply
                         scale: 0.034
-                        #rotate: [120,23.3,-3.3]
                         rotate: [90,180,0]
                         translate: [0,-3.5,0]
+                        radius_correction: -4.3
+                        #file: corsair/fighter2.ply
+                        #scale: 3.5
+                        #rotate: [5,0,0]
+                        #translate: [0,-1.6,0]
                 
                 destructible: no
+                
                 destroys_player: no
+                
+                target: no
                 
                 
         -
@@ -98,14 +121,36 @@ elements:
                         translate: [0,0,0]
                 
                 destructible: no
+                
                 destroys_player: no
+                
+                target: no
+
+        -
+                name: SimpleMissile
+                subtitle:
+
+                type: gun
+
+                model:
+                        file: water-bomb/water-bomb.ply
+                        scale: 0.1
+                        rotate: [0,0,0]
+                        translate: [0,0,0]
+                        radius_correction: -3.
+                
+                destructible: no
+                
+                destroys_player: no
+                
+                target: no
 
 
 scene:
         # Dimensões da cena. x, y e z  vão de -1000 à 1000
         # quando um objeto ultrapassa esses limites, ele "warpa" para
         # para o lado oposto, como no asteroids 2d
-        dimensions: [20000,20000,20000]
+        dimensions: [8000,8000,8000]
 
         # Indica os posicionamentos dos elementos acima. não podemos
         # colocar o posicionamento no item anterior porque um elemento

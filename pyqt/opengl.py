@@ -18,16 +18,21 @@ class GLController(QGLWidget):
     def __init__(self, parent):
         QGLWidget.__init__(self, parent)
         
+        self.painter = QPainter()
+        
         cfg = Config('game','OpenGL')
         
-        self.fps = cfg.get('fps')
         self.clearColor = cfg.get('clear_color')
         
-        self.painter = QPainter()
+        self.fps = cfg.get('fps')
+        self.fps_sum = 0.
+        self.fps_count = 0
+        self.show_fps = 0.
+        self.fps_elapsed = 0.
         
         self.adjust_widget()
         self.adjust_timer()
-    
+            
     def adjust_widget(self):
         self.setAttribute(Qt.WA_KeyCompression,False)
         self.setMouseTracking(True)
@@ -110,9 +115,7 @@ class GLController(QGLWidget):
         elapsed = new_time - self.last_time
         self.last_time = new_time
         
-        self.fps = 1 / elapsed
-        
-        print 'fps =', self.fps
+        self.adjust_fps(elapsed)
         
         # if we run out of screens, the game is over
         if (not len(self.screen_stack)):
@@ -123,6 +126,23 @@ class GLController(QGLWidget):
         
         self.updateGL()
 
+    def adjust_fps(self, elapsed):
+        fps = 1 / elapsed
+        
+        self.fps_sum += fps
+        self.fps_count += 1
+        
+        self.fps_elapsed += elapsed
+        
+        if (self.fps_elapsed >= .5):
+            self.fps_elapsed = 0.
+            fps = self.fps_sum / self.fps_count
+            
+            self.fps_sum = 0.
+            self.fps_count = 0
+            
+            self.show_fps = fps
+        
     def get_parent_screen(self, screen):
         i = self.screen_stack.index(screen)
         return self.screen_stack[i-1]
@@ -177,6 +197,9 @@ class GLController(QGLWidget):
         # and to his painter
         new_screen.qpainter = self.painter
         
+        if (hasattr(new_screen, 'with_controller')):
+            new_screen.with_controller()
+        
         # finally, push it
         self.screen_stack.append(new_screen)
 
@@ -198,8 +221,8 @@ class GLController(QGLWidget):
     def send_generic_event(self, event_name, event_arg):        
         for screen in reversed(self.screen_stack):
             if (hasattr(screen, event_name)):
-                getattr(screen, event_name)(event_arg)
-                return
+                if (getattr(screen, event_name)(event_arg) is None):
+                    return
     
     def mouse_pos(self):
         return self.mapFromGlobal(QCursor.pos())

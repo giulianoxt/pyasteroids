@@ -1,7 +1,7 @@
 import yaml
 
 from random import uniform
-from itertools import chain
+from itertools import chain, ifilter
 
 from OpenGL.GL import *
 from OpenGL.GLU import *
@@ -13,18 +13,26 @@ from PyQt4.QtOpenGL import QGLWidget
 from util.config import Config
 from util.opengl import default_perspective
 
-from physics.shape import Shape
 from model.opengl import GLModel
+
+from physics.shape import Shape
 from physics.vector3d import Vector3d
+from physics.collision import collide
 
 from objects import Object
 from objects.portal import Portal
 from objects.planet import Planet
 from objects.asteroid import Asteroid
 from objects.spaceship import SpaceShip
+from objects.particles import ParticleSystem
 from objects.gun import SimpleGun, SimpleShoot
+from objects.missile import SimpleMissile, Missile
+
+from game.state import Player
 
 from screens.camera import Camera
+
+from util.misc import xisinstance
 
 
 class Level(object):
@@ -36,9 +44,11 @@ class Level(object):
         
         self.objects = set()
         self.asteroids = set()
-        self.shoots = set()
+        self.shots = set()
         self.planets = set()
         self.portals = set()
+        self.particles = set()
+        self.missiles = set()
         self.ship = None
         
         cfg = Config('levels',str(level_number))
@@ -47,40 +57,54 @@ class Level(object):
         self.load_file(level_name)
         
         skybox = cfg.get('skybox')
-        #self.setup_skybox('resources/'+skybox)
+        self.setup_skybox('resources/'+skybox)
+        
+        self.first = True
     
     def add_object(self, obj):
-        if (isinstance(obj, SimpleShoot)):
-            self.shoots.add(obj)
-        elif (isinstance(obj, Portal)):
+        if (xisinstance(obj, SimpleShoot)):
+            self.shots.add(obj)
+        elif (xisinstance(obj, ParticleSystem)):
+            self.particles.add(obj)
+        elif (xisinstance(obj, Missile)):
+            self.missiles.add(obj)
+        elif (xisinstance(obj, Portal)):
             self.portals.add(obj)
-        elif (isinstance(obj, Planet)):
+        elif (xisinstance(obj, Planet)):
             self.planets.add(obj)
-        elif (isinstance(obj, Asteroid)):
+        elif (xisinstance(obj, Asteroid)):
             self.asteroids.add(obj)
-        elif (isinstance(obj, SpaceShip)):
+        elif (xisinstance(obj, SpaceShip)):
             self.ship = obj
-        elif (isinstance(obj, Object)):
+        elif (xisinstance(obj, Object)):
             self.objects.add(obj)
+        else:
+            raise NotImplementedError()
 
     def remove_object(self, obj):
-        if (isinstance(obj, SimpleShoot)):
-            self.shoots.remove(obj)
-        elif (isinstance(obj, Portal)):
+        if (xisinstance(obj, SimpleShoot)):
+            self.shots.remove(obj)
+        elif (xisinstance(obj, ParticleSystem)):
+            self.particles.remove(obj)
+        elif (xisinstance(obj, Missile)):
+            self.missiles.remove(obj)
+        elif (xisinstance(obj, Portal)):
             self.portals.remove(obj)
-        elif (isinstance(obj, Planet)):
+        elif (xisinstance(obj, Planet)):
             self.planets.remove(obj)
-        elif (isinstance(obj, Asteroid)):
+        elif (xisinstance(obj, Asteroid)):
             self.asteroids.remove(obj)
-        elif (isinstance(obj, SpaceShip)):
+        elif (xisinstance(obj, SpaceShip)):
             self.ship = None
-        elif (isinstance(obj, Object)):
+        elif (xisinstance(obj, Object)):
             self.objects.remove(obj)
+        else:
+            raise NotImplementedError
     
     def all_objects(self):
         return chain(
-            self.shoots, self.portals, self.planets,
-            self.asteroids, (self.ship,), self.objects
+            self.shots, self.portals, self.planets, self.missiles,
+            self.asteroids, (self.ship,), self.objects, self.particles
         )
     
     def load_file(self, level_name):
@@ -88,6 +112,8 @@ class Level(object):
 
         self.title = lvl['name']
         self.dimensions = lvl['scene']['dimensions']
+
+        self.time = float(lvl['time']) * 60
 
         models = {}
 
@@ -97,11 +123,12 @@ class Level(object):
             name = element['name']
             subtitle = element['subtitle']
             
-            translate = element['model']['translate']
-            rotate = element['model']['rotate']
-            scale = element['model']['scale']
+            translate = element['model'].get('translate', (0.,0.,0.))
+            rotate = element['model'].get('rotate', (0.,0.,0.))
+            scale = element['model'].get('scale', 1.)
+            rc = element['model'].get('radius_correction', 0.)
             
-            gl_model = GLModel(file, translate, rotate, scale)
+            gl_model = GLModel(file, translate, rotate, scale, rc)
             
             models[name] = (gl_model, element)            
             
@@ -117,6 +144,8 @@ class Level(object):
         }
         
         id_table = { }
+        
+        obj_set = set()
         
         for object in lvl['scene']['objects']:
             element_name = object['element']
@@ -154,10 +183,15 @@ class Level(object):
                                     
             _object = type_class[type](model, shape, element)
             
-            self.add_object(_object)
+            obj_set.add(_object)
             
             if ('id' in object):
                 id_table[object['id']] = _object
+        
+        for obj in obj_set:
+            self.add_object(obj)
+        
+        Player.get_instance().beginning_level(self)
         
         self.make_spaceship(lvl, models)
         self.make_guns(models)
@@ -174,7 +208,7 @@ class Level(object):
         
         model, element = models[lvl['ship']['model']]
         
-        self.ship = SpaceShip(model, shape, element)
+        self.ship = SpaceShip(model, shape, element, self)
 
         self.camera = Camera(self.ship, lvl['ship']['camera-dist'])
 
@@ -183,13 +217,16 @@ class Level(object):
     def make_guns(self, models):
         model = models['SimpleGun'][0]
         self.ship.simple_gun = SimpleGun(model, self.ship, self)
+        
+        model = models['SimpleMissile'][0]
+        self.ship.simple_missile = SimpleMissile(model, self.ship, self)
 
     def draw(self):
         default_perspective(self.controller.width(), self.controller.height())
         
         self.camera.put_in_position()
         
-        #self.draw_skybox(self.camera.pos)
+        self.draw_skybox(self.camera.pos)
 
         for obj in self.all_objects():
             obj.draw()
@@ -199,9 +236,54 @@ class Level(object):
             obj.tick(time_elapsed)
 
         self.wrap_ship()
+        
         self.update_mouse_spin(time_elapsed)
+        
         self.camera.tick(time_elapsed)
-        #self.update_skybox(time_elapsed)
+        
+        self.update_skybox(time_elapsed)
+        
+        self.check_collisions(time_elapsed)
+        
+        self.time -= time_elapsed
+    
+    def check_collisions(self, time_elapsed):
+        self.new, self.erase = set(), set()
+        
+        self.check_groups((self.ship,), self.planets, self.asteroids)
+        self.check_groups(self.shots, self.planets, self.asteroids)
+        self.check_groups(self.missiles, self.planets, self.asteroids)
+
+        for obj in self.erase:
+            self.remove_object(obj)
+
+        for obj in self.new:
+            self.add_object(obj)
+    
+    def check_groups(self, g_src, *g_dest):
+        for obj1 in g_src:
+            for obj2 in chain(*g_dest):
+                if (collide(obj1,obj2)):
+                    s1 = obj1._collided(obj2)
+                    self.handle_collision_status(s1)
+                    
+                    s2 = obj2._collided(obj1)
+                    self.handle_collision_status(s2)
+                    
+    def handle_collision_status(self, st):
+        if (st is None):
+            return
+        
+        if (type(st[0]) == type('')):
+            st = (st,)
+        
+        for (op,obj) in st:
+            if (op == 'add'):
+                self.new.add(obj)
+            elif (op == 'remove'):
+                self.erase.add(obj)
+            else:
+                raise NotImplementedError()
 
     def setup_skybox(self, image_path):
         self.skybox_textures = glGenTextures(6)
@@ -210,8 +292,8 @@ class Level(object):
         for (tex_id, side) in zip(self.skybox_textures, sides):  
             glBindTexture(GL_TEXTURE_2D, tex_id)
         
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
         
             img = QImage(image_path+'-'+side+'.png')
             img = QGLWidget.convertToGLFormat(img)
@@ -309,12 +391,13 @@ class Level(object):
         glPopMatrix();
 
     def keyPressEvent(self, event):
+        if (event.isAutoRepeat()):
+            return
+        
         k = event.key()
         
         if (k == Qt.Key_Escape):
             self.controller.pop_screen(self)
-        elif (k == Qt.Key_W):
-            self.ship.move_forward()
         elif (k == Qt.Key_Up):
             self.ship.spin('up', True)
         elif (k == Qt.Key_Down):
@@ -323,16 +406,20 @@ class Level(object):
             self.ship.spin('left', True)
         elif (k == Qt.Key_Right):
             self.ship.spin('right', True)
+        elif (k == Qt.Key_W):
+            self.ship.strafing('forward', True)
         elif (k == Qt.Key_A):
             self.ship.strafing('left',True)
         elif (k == Qt.Key_D):
             self.ship.strafing('right',True)
+        elif (k == Qt.Key_S):
+            self.ship.strafing('breake',True)
         elif (k == Qt.Key_B):
-            if (not event.isAutoRepeat()):
-                self.camera.invert()
+            self.camera.invert()
         elif (k == Qt.Key_Space):
-            if (not event.isAutoRepeat()):
-                self.ship.simple_gun.start_shoot()
+            self.ship.simple_gun.start_shoot()
+        elif (k == Qt.Key_P):
+            self.controller.push_screen('PauseMessage')
         else:
             event.ignore()
 
@@ -350,10 +437,14 @@ class Level(object):
             self.ship.spin('left', False)
         elif (k == Qt.Key_Right):
             self.ship.spin('right', False)
+        elif (k == Qt.Key_W):
+            self.ship.strafing('forward', False)
         elif (k == Qt.Key_A):
             self.ship.strafing('left',False)
         elif (k == Qt.Key_D):
             self.ship.strafing('right',False)
+        elif (k == Qt.Key_S):
+            self.ship.strafing('breake',False)
         elif (k == Qt.Key_B):
             if (not event.isAutoRepeat()):
                 self.camera.invert()
@@ -368,8 +459,8 @@ class Level(object):
         
         if (b == Qt.LeftButton):
             self.ship.simple_gun.start_shoot()
-        else:
-            event.ignore()
+#        elif (b == Qt.RightButton):
+#            self.ship.simple_missile.single_shoot()
 
     def mouseReleaseEvent(self, event):
         b = event.button()
@@ -382,6 +473,11 @@ class Level(object):
     def update_mouse_spin(self, time_elapsed):
         if (self.controller is None):
             return
+
+        if (self.first):
+            m_center = self.controller.mouse_center
+            self.controller.cursor().setPos(*m_center)
+            self.first = False
 
         pos = self.controller.cursor().pos()
         x, y = pos.x(), pos.y()
@@ -397,16 +493,16 @@ class Level(object):
         dx, dy, dz = map(lambda x : x / 2., self.dimensions)
         
         if (pos.x > dx):
-            pos.x -= dx
+            pos.x -= dx*2
         elif (pos.x < -dx):
-            pos.x += dx
+            pos.x += dx*2
             
         if (pos.y > dy):
-            pos.y -= dy
+            pos.y -= dy*2
         elif (pos.y < -dy):
-            pos.y += dy            
+            pos.y += dy*2          
             
         if (pos.z > dz):
-            pos.z -= dz
+            pos.z -= dz*2
         elif (pos.z < -dz):
-            pos.z += dz
+            pos.z += dz*2

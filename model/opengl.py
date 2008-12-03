@@ -6,18 +6,18 @@
 from math import sqrt
 
 from OpenGL.GL import *
+from OpenGL.GLUT import *
 
 from PyQt4.QtGui import QImage
 from PyQt4.QtOpenGL import QGLWidget
 
 from model.ply import PLYModel
 
-from physics.vector3d import Vector3d
-from physics.collision import BoundingSphere
+from util.config import Config
 
 
 class GLModel(object):
-    def __init__(self, file, translate = (0.,0.,0.), rotate = (0.,0.,0.), scale = 0.):
+    def __init__(self, file, translate = (0.,0.,0.), rotate = (0.,0.,0.), scale = 0., rc = 0.):
         self.ply = PLYModel(file)
         
         self.textures = None
@@ -29,7 +29,9 @@ class GLModel(object):
         if ('material' in self.ply and 'material_index' in self.ply['face'][0]):
             self.generate_textures()      
     
-        self.sphere = BoundingSphere()
+        self.radius = rc
+    
+        self.draw_sphere = Config('game','OpenGL').get('draw_bounding_sphere')
     
         self.make_display_list(translate, rotate, scale)
     
@@ -141,8 +143,10 @@ class GLModel(object):
         max_y = (max_y + self.offset[1]) * self.scale
         max_z = (max_z + self.offset[2]) * self.scale
         
-        self.sphere.center = Vector3d(0.,0.,0.)
-        self.sphere.radius = sqrt(max_x**2 + max_y**2 + max_z**2)
+        self.radius += sqrt(max_x**2 + max_y**2 + max_z**2)
+        
+        if (self.draw_sphere):
+            glutWireSphere(self.radius / self.scale, 20, 20)
     
     def draw(self):
         glMatrixMode(GL_MODELVIEW)

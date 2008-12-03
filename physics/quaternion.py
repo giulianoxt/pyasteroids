@@ -90,6 +90,11 @@ class Quaternion(object):
             
             return Vector3d(res_quat.x, res_quat.y, res_quat.z)
 
+try:
+    import psyco
+    psyco.bind(Quaternion)
+except:
+    pass
 
 if (__name__ == '__main__'):    
     # 90 pra cima (0,1,0)

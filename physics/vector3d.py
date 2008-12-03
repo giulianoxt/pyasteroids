@@ -54,6 +54,14 @@ class Vector3d:
 	def __getitem__(self, i):
 		return (self.x, self.y, self.z)[i]
 	
+	def __setitem__(self, i, v):
+		slots = [self.x, self.y, self.z]
+		slots[i] = v
+		self.x, self.y, self.z = slots
+	
+	def __len__(self):
+		return 3
+	
 	# cross product
 	def cross_product(self, vec3d):
 		x_cp = self.y*vec3d.z - self.z*vec3d.y
@@ -114,3 +122,8 @@ class Vector3d:
 		self.y = self.y.real
 		self.z = self.z.real
 
+try:
+	import psyco
+	psyco.bind(Vector3d)
+except:
+	pass

@@ -5,9 +5,16 @@ class Object(object):
         self.model = model
         self.shape = shape
     
+        self.target = element['target']
         self.destructible = element['destructible']
-        self.hp = element['hp'] if self.destructible else -1
         self.hostile = element['destroys_player']
+        
+        if (self.destructible):
+            self.hp = element['hp']
+            self.score = element['score']
+        
+        if (self.hostile):
+            self.damage = element['damage']
     
     def draw(self):
         glMatrixMode(GL_MODELVIEW)
@@ -26,3 +33,14 @@ class Object(object):
    
     def tick(self, time_elapsed):
         self.shape.update(time_elapsed)
+
+    def _collided(self, obj):       
+        obj_class_name = obj.__class__.__name__
+        method_name = 'collided_with_' + obj_class_name.lower()
+        
+        if (hasattr(self, method_name)):
+            return getattr(self, method_name)(obj)
+        elif (hasattr(self, 'collided')):
+            return self.collided(obj)
+        else:
+            return None

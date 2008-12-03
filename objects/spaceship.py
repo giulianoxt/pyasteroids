@@ -2,6 +2,8 @@ from math import *
 
 from OpenGL.GL import *
 
+from game.state import Player
+
 from objects import Object
 
 from util import sign
@@ -12,16 +14,20 @@ from physics.quaternion import Quaternion
 
 
 class SpaceShip(Object):
-    def __init__(self, model, shape, element):
+    def __init__(self, model, shape, element, level):
         Object.__init__(self, model, shape, element)
         
         cfg = Config('physics','Ship')
         
         self.move_force_sz = cfg.get('move_force')
         self.spin_velocity = cfg.get('spin_velocity')
-        self.strafe_velocity = cfg.get('strafe_velocity')
+        self.strafe_force = cfg.get('strafe_force')
+        self.shape.forces_res.append(cfg.get('vacuum_resistance'))
+        self.breake_rate = cfg.get('breake_rate')
         
         self.mouse_sensivity = Config('game','Mouse').get('sensivity')
+        
+        self.level = level
         
         self.rotation = Quaternion.from_axis_rotations(0.,0.,0.)
         
@@ -43,17 +49,24 @@ class SpaceShip(Object):
         }
         
         self.strafe = {
+            'forward': False,
             'left'  : False,
-            'right' : False
+            'right' : False,
+            'breake' : False
         }
         
         self.strafe_vectors = {
-            'left'  : Vector3d(-1.,0.,0.),
-            'right' : Vector3d( 1.,0.,0.)
+            'forward':Vector3d(0.,0.,-0.7),
+            'left'  : Vector3d(-0.9,0.,0.),
+            'right' : Vector3d(0.9,0.,0.),
+            'breake' : Vector3d(0.,0.,1.)
         }
         
         self.angles = [0.,0.]
         self.mouse_target = [0.,0.]
+        
+        self.collision_set = set()
+        self.keep_colliding = set()
 
     def draw(self):        
         glMatrixMode(GL_MODELVIEW)
@@ -76,11 +89,16 @@ class SpaceShip(Object):
 
     def tick(self, time_elapsed):       
         Object.tick(self, time_elapsed)
-        
+                
         self.update_mouse_track(time_elapsed)
         self.update_spinning(time_elapsed)
         self.update_strafe(time_elapsed)
+        
         self.simple_gun.tick(time_elapsed)
+        self.simple_missile.tick(time_elapsed)
+        
+        self.collision_set = self.keep_colliding
+        self.keep_colliding = set()
         
     def update_spinning(self, time_elapsed):
         for dir in self.spinning:
@@ -103,12 +121,13 @@ class SpaceShip(Object):
     def update_strafe(self, time_elapsed):
         for dir in self.strafe:
             if (self.strafe[dir]):
-                d = self.strafe_velocity * time_elapsed
-        
-                move = (self.rotation * self.strafe_vectors[dir])
-                move = move.normalizing().scalar(d)
-                
-                self.shape.position += move
+                if (dir == 'breake'):
+                    self.shape.forces_res_tmp.append(self.breake_rate)
+                else:
+                    sz = self.strafe_vectors[dir].get_mod()
+                    
+                    v = (self.rotation * self.strafe_vectors[dir])
+                    self.shape.forces_tmp.append(v.scalar(self.strafe_force*sz))
     
     def spin(self, dir, b):
         self.spinning[dir] = b
@@ -161,3 +180,14 @@ class SpaceShip(Object):
         if (dy != 0.):
             ay = self.mouse_sensivity * dy * -1.
             self.mouse_target[1] += ay
+
+    def collided(self, obj):
+        self.keep_colliding.add(obj)
+        
+        if (obj in self.collision_set):
+            return
+        
+        if (obj.hostile):
+            Player.get_instance().got_hit(obj)
+
+        self.level.controller.push_screen('FadeMessage', 'Ship_Hit')
