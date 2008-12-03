@@ -15,7 +15,16 @@ from util.config import Config
 from util.opengl import default_perspective
 
 class GLController(QGLWidget):
+    instance = None
+    
+    @classmethod
+    def get_instance(cls):
+        return GLController.instance
+    
     def __init__(self, parent):
+        if (GLController.instance is None):
+            GLController.instance = self
+        
         QGLWidget.__init__(self, parent)
         
         self.painter = QPainter()

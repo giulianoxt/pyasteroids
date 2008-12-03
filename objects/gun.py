@@ -95,18 +95,15 @@ class SimpleShoot(Object):
         if (self.elapsed >= self.duration):
             self.lvl.remove_object(self)
             
-    def collided_with_asteroid(self, ast):
-        if (not ast.destructible):
-            return
-        
-        ast.hp -= self.damage
-        
+    def collided_with_asteroid(self, ast):        
         l = [('remove', self)]
         
-        if (ast.hp <= 0):
-            Player.get_instance().object_destroyed(ast)
-            l.append(('remove', ast))
+        if (ast.destructible):
+            ast.hp -= self.damage
+            if (ast.hp <= 0):
+                Player.get_instance().object_destroyed(ast)
+                l.append(('remove', ast))
         
         return l
-
+        
     collided_with_planet = collided_with_asteroid

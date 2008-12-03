@@ -2,7 +2,7 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 
 from PyQt4.QtGui import QColor
-from PyQt4.QtCore import Qt, QRect
+from PyQt4.QtCore import Qt, QRect, QPoint
 
 from util.config import Config, FontManager
 
@@ -13,10 +13,13 @@ qt_center_flag = Qt.AlignVCenter | Qt.AlignHCenter
 
 
 class FadeMessage(object):
-    def __init__(self, message):
+    def __init__(self, message, str = None):
         cfg = Config('messages', message)
 
-        self.str = cfg.get('message')
+        if (str is None):
+            self.str = cfg.get('message')
+        else:
+            self.str = str
         
         self.duration = cfg.get('duration')
         self.fade_duration = cfg.get('fade_duration')
@@ -83,7 +86,7 @@ class FadeMessage(object):
         self.qpainter.fillRect(self.rect, self.color)
         self.qpainter.setFont(self.font)
         self.qpainter.setPen(self.font_color)
-        self.qpainter.drawText(self.rect, qt_center_flag, self.str)
+        self.bounding_text_rect = self.qpainter.drawText(self.rect, qt_center_flag, self.str)
 
 
 class PauseMessage(FadeMessage):
@@ -102,3 +105,34 @@ class PauseMessage(FadeMessage):
         if (k == Qt.Key_P or k == Qt.Key_Escape):
             self.elapsed = 0.
             self.state = 2
+
+
+class MovingMessage(FadeMessage):
+    def __init__(self, message, str = None, pos = None):
+        cfg = Config('messages', message)
+        
+        if (pos is None):
+            self.pos = QPoint(*cfg.get('position'))
+        else:
+            self.pos = QPoint(*pos)
+        
+        self.velocity = cfg.get('velocity') 
+        
+        FadeMessage.__init__(self, message, str)
+    
+    def with_controller(self):
+        self.rect = QRect(0, 0, self.controller.width(), self.controller.height())
+        self.rect.moveCenter(self.pos)
+
+    def tick(self, elapsed):        
+        FadeMessage.tick(self, elapsed)
+
+        self.pos.setX(self.pos.x() + self.velocity[0] * elapsed)
+        self.pos.setY(self.pos.y() + self.velocity[1] * elapsed)
+        
+        self.rect.moveCenter(self.pos)
+    
+    def draw(self):
+        FadeMessage.draw(self)
+        
+        self.rect = self.bounding_text_rect

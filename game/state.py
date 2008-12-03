@@ -1,4 +1,11 @@
+from OpenGL.GL import *
+from OpenGL.GLU import *
+
 from util.config import Config
+
+from pyqt.opengl import GLController
+
+from util.opengl import default_perspective
 
 
 class Player(object):
@@ -26,6 +33,8 @@ class Player(object):
                 self.initial_targets += 1
         
         self.targets = self.initial_targets
+        
+        self.level = level
     
     def object_added(self, obj):
         if (obj.target):
@@ -37,6 +46,23 @@ class Player(object):
             self.targets -= 1
         
         self.score += obj.score
+               
+        glMatrixMode(GL_MODELVIEW)
+        glPushMatrix()
+        glLoadIdentity()
+        
+        controller = GLController.get_instance()
+        
+        default_perspective(controller.width(), controller.height())
+        
+        self.level.camera.put_in_position()
+        
+        pos = map(int, gluProject(*obj.shape.position)[0:2])
+        pos[1] = controller.height() - pos[1]
+        
+        glPopMatrix()
+        
+        controller.push_screen('MovingMessage','Show_Score','+'+str(obj.score),pos)
     
     def got_hit(self, obj):
         if (obj.hostile):
