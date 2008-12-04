@@ -1,6 +1,6 @@
 import os
 
-from PyQt4.QtGui import QMainWindow
+from PyQt4.QtGui import QMainWindow, QApplication
 
 from ui_mainWindow import Ui_MainWindow
 
@@ -18,6 +18,17 @@ class EditorMainWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         
         self.models = {}
+        
+        self.setGeometry(int(QApplication.desktop().width() -
+            (QApplication.desktop().width() -
+            (QApplication.desktop().width() / 2)) * 1.5) / 2,
+            int(QApplication.desktop().height() -
+            (QApplication.desktop().height() -
+             (QApplication.desktop().height() / 2)) * 1.5) / 2,
+            int((QApplication.desktop().width() -
+            (QApplication.desktop().width() / 2)) * 1.5),
+            int((QApplication.desktop().height() -
+            (QApplication.desktop().height() / 2)) * 1.5))
     
     def with_gl_context(self):
         self.load_modules()
@@ -35,6 +46,8 @@ class EditorMainWindow(QMainWindow, Ui_MainWindow):
                 
                 filename = file[:-4]
                 
-                self.models[filename] = GLModel(open(dirpath+'/'+file, 'r'))
-
-                self.listWidget.addItem(filename)
+                try:
+                    self.models[filename] = GLModel(open(dirpath+'/'+file, 'r'))
+                    self.listWidget.addItem(filename)
+                except:
+                    pass

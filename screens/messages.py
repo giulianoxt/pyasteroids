@@ -1,7 +1,7 @@
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
-from PyQt4.QtGui import QColor
+from PyQt4.QtGui import QColor, QImage
 from PyQt4.QtCore import Qt, QRect, QPoint
 
 from util.config import Config, FontManager
@@ -137,3 +137,86 @@ class MovingMessage(FadeMessage):
         
         if (self.color.alpha() == 0):
             self.rect = self.bounding_text_rect
+
+
+qt_sms_flag = Qt.TextWordWrap
+
+
+class SMSTextMessage(object):
+    def __init__(self, message, str = None):       
+        cfg = Config('chats', message)
+
+        if (str is None):
+            self.str = cfg.get('message')
+        else:
+            self.str = str
+        
+        self.str = self.str.replace('\\\n', '').replace('\n','\n\n')
+        
+        self.duration = cfg.get('duration')
+        
+        self.font = FontManager.getFont(cfg.get('font'))
+        self.font.setPointSize(cfg.get('font_size'))
+        self.font_color = QColor.fromRgb(*cfg.get('font_color'))
+        
+        self.image = QImage(cfg.get('image_path'))
+        
+        p = cfg.get('image_pos')
+        self.image_rect = QRect(0.,0.,self.image.width(),self.image.height())
+        self.image_rect.moveCenter(QPoint(p[0],p[1]))
+        
+        self.text_rect = QRect(*cfg.get('text_rect'))
+        
+        self.has_cursor = True
+        self.blink_elapsed = 0.
+        self.blink_time = cfg.get('blink_time')
+
+        self.elapsed = 0.
+        self.message_sz = len(self.str)
+
+    def tick(self, elapsed):
+        self.controller.tick_parent(self, elapsed)
+        
+        self.elapsed += elapsed
+        self.blink_elapsed += elapsed
+        
+        if (self.blink_elapsed >= self.blink_time):
+            self.blink_elapsed -= self.blink_time
+            self.has_cursor = not self.has_cursor
+    
+    def draw(self):
+        self.controller.draw_parent(self)
+        
+        ortho_projection(
+            self.controller.width(), self.controller.height()
+        )
+
+        self.qpainter.drawImage(self.image_rect, self.image)
+        
+        i = int((self.elapsed / self.duration) * self.message_sz)
+        text = self.str[0:i]
+        
+        if (self.has_cursor):
+            text += '|'
+        
+        self.qpainter.setFont(self.font)
+        self.qpainter.setPen(self.font_color)
+        
+        #self.qpainter.fillRect(self.text_rect, self.font_color)
+        self.qpainter.drawText(self.text_rect, qt_sms_flag, text)
+
+    def keyPressEvent(self, event):        
+        k = event.key()
+        
+        if (k == Qt.Key_Return or k == Qt.Key_Enter):
+            if (event.isAutoRepeat()):
+                return
+            
+            if (self.elapsed >= self.duration):
+                self.controller.pop_screen(self)
+            else:
+                self.elapsed = self.duration + 0.1
+            
+            return
+        
+        return True

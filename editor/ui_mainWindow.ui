@@ -34,25 +34,12 @@
       <x>10</x>
       <y>0</y>
       <width>171</width>
-      <height>261</height>
+      <height>191</height>
      </rect>
     </property>
     <property name="title" >
      <string>Scene</string>
     </property>
-    <widget class="QLabel" name="label_3" >
-     <property name="geometry" >
-      <rect>
-       <x>11</x>
-       <y>88</y>
-       <width>35</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="text" >
-      <string>Stars:</string>
-     </property>
-    </widget>
     <widget class="QLineEdit" name="lineEdit" >
      <property name="geometry" >
       <rect>
@@ -64,57 +51,6 @@
      </property>
      <property name="text" >
       <string>Untitled</string>
-     </property>
-    </widget>
-    <widget class="QSpinBox" name="spinBox" >
-     <property name="geometry" >
-      <rect>
-       <x>53</x>
-       <y>88</y>
-       <width>107</width>
-       <height>23</height>
-      </rect>
-     </property>
-     <property name="maximum" >
-      <number>500</number>
-     </property>
-     <property name="singleStep" >
-      <number>10</number>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_4" >
-     <property name="geometry" >
-      <rect>
-       <x>11</x>
-       <y>116</y>
-       <width>36</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="text" >
-      <string>Zoom:</string>
-     </property>
-    </widget>
-    <widget class="QSlider" name="horizontalSlider" >
-     <property name="geometry" >
-      <rect>
-       <x>53</x>
-       <y>116</y>
-       <width>107</width>
-       <height>24</height>
-      </rect>
-     </property>
-     <property name="maximum" >
-      <number>1000</number>
-     </property>
-     <property name="orientation" >
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="invertedAppearance" >
-      <bool>false</bool>
-     </property>
-     <property name="invertedControls" >
-      <bool>false</bool>
      </property>
     </widget>
     <widget class="QSpinBox" name="spinBox_2" >
@@ -166,7 +102,7 @@
      <property name="geometry" >
       <rect>
        <x>113</x>
-       <y>181</y>
+       <y>120</y>
        <width>47</width>
        <height>26</height>
       </rect>
@@ -179,7 +115,7 @@
      <property name="geometry" >
       <rect>
        <x>62</x>
-       <y>146</y>
+       <y>90</y>
        <width>47</width>
        <height>26</height>
       </rect>
@@ -192,7 +128,7 @@
      <property name="geometry" >
       <rect>
        <x>11</x>
-       <y>181</y>
+       <y>120</y>
        <width>47</width>
        <height>26</height>
       </rect>
@@ -205,7 +141,7 @@
      <property name="geometry" >
       <rect>
        <x>62</x>
-       <y>216</y>
+       <y>150</y>
        <width>47</width>
        <height>26</height>
       </rect>
@@ -218,7 +154,7 @@
      <property name="geometry" >
       <rect>
        <x>62</x>
-       <y>181</y>
+       <y>120</y>
        <width>47</width>
        <height>26</height>
       </rect>
@@ -483,7 +419,7 @@
       <x>870</x>
       <y>0</y>
       <width>171</width>
-      <height>581</height>
+      <height>191</height>
      </rect>
     </property>
     <property name="title" >
@@ -495,7 +431,7 @@
        <x>10</x>
        <y>30</y>
        <width>151</width>
-       <height>551</height>
+       <height>151</height>
       </rect>
      </property>
     </widget>
@@ -526,6 +462,58 @@
      </property>
      <property name="autoFillBackground" >
       <bool>false</bool>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_5" >
+    <property name="enabled" >
+     <bool>true</bool>
+    </property>
+    <property name="geometry" >
+     <rect>
+      <x>870</x>
+      <y>190</y>
+      <width>171</width>
+      <height>191</height>
+     </rect>
+    </property>
+    <property name="title" >
+     <string>Elements</string>
+    </property>
+    <widget class="QListWidget" name="listWidget_2" >
+     <property name="geometry" >
+      <rect>
+       <x>10</x>
+       <y>30</y>
+       <width>151</width>
+       <height>151</height>
+      </rect>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_6" >
+    <property name="enabled" >
+     <bool>true</bool>
+    </property>
+    <property name="geometry" >
+     <rect>
+      <x>870</x>
+      <y>380</y>
+      <width>171</width>
+      <height>191</height>
+     </rect>
+    </property>
+    <property name="title" >
+     <string>Objects</string>
+    </property>
+    <widget class="QListWidget" name="listWidget_3" >
+     <property name="geometry" >
+      <rect>
+       <x>10</x>
+       <y>30</y>
+       <width>151</width>
+       <height>151</height>
+      </rect>
      </property>
     </widget>
    </widget>

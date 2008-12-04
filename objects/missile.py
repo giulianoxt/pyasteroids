@@ -98,6 +98,10 @@ class Missile(Object):
         self.dir = Vector3d(0.,0.,0.)
         
     def tick(self, time_elapsed):
+        if (hasattr(self.target, 'destroyed') and self.target.destroyed):
+            self.lvl.remove_object(self)
+            return
+        
         self.dir = (self.target.shape.position - self.shape.position).normalizing()
         
         v = self.dir.scalar(self.velocity)

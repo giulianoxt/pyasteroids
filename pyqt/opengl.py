@@ -41,7 +41,10 @@ class GLController(QGLWidget):
         
         self.adjust_widget()
         self.adjust_timer()
-            
+        
+        self.to_hook = None
+        self.hooks = {}
+        
     def adjust_widget(self):
         self.setAttribute(Qt.WA_KeyCompression,False)
         self.setMouseTracking(True)
@@ -169,9 +172,28 @@ class GLController(QGLWidget):
         # erases that screen and all above it
         try:
             i = self.screen_stack.index(screen)
+            
+            add = set()
+            
+            for screen in self.screen_stack[i:]:
+                if (screen in self.hooks):
+                    add.add(self.hooks[screen])
+                    del self.hooks[screen]
+                    
             del self.screen_stack[i:]
+            
+            for (name, args, kwargs) in add:
+                kw = {}
+                for (k,v) in kwargs:
+                    kw[k] = v  
+                    
+                self.push_screen(name, *args, **kw)
+            
         except ValueError:
             pass
+
+    def set_hook(self, screen_name, *args, **kwargs):
+        self.to_hook = (screen_name, args, tuple(kwargs.iteritems()))
 
     def push_screen(self, new_screen_name, *args, **kwargs):   
         NewScreenCls = None
@@ -208,12 +230,16 @@ class GLController(QGLWidget):
         
         # and to his painter
         new_screen.qpainter = self.painter
+                
+        # finally, push it
+        self.screen_stack.append(new_screen)
+        
+        if (self.to_hook is not None):
+            self.hooks[new_screen] = self.to_hook
+            self.to_hook = None
         
         if (hasattr(new_screen, 'with_controller')):
             new_screen.with_controller()
-        
-        # finally, push it
-        self.screen_stack.append(new_screen)
 
     def keyPressEvent(self, keyEvent):       
         self.send_generic_event('keyPressEvent', keyEvent)

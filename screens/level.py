@@ -36,7 +36,11 @@ from util.misc import xisinstance
 
 
 class Level(object):
+    instance = None
+    
     def __init__(self, level_number):
+        Level.instance = self
+        
         self.number = level_number
         
         self.camera = None
@@ -60,6 +64,9 @@ class Level(object):
         self.setup_skybox('resources/'+skybox)
         
         self.first = True
+    
+    def with_controller(self):
+        pass
     
     def add_object(self, obj):
         if (xisinstance(obj, SimpleShoot)):

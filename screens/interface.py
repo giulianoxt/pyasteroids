@@ -61,6 +61,10 @@ class Interface(object):
         self.radar = Radar.from_config('E-Radar', self)
         self.missile = GuidedMissile.from_config('GuidedMissile', self)
 
+    def with_controller(self):
+        self.controller.set_hook('SMSTextMessage', 'TutorialIntro')
+        self.controller.push_screen('MovingMessage', 'Show_Level_Name', self.level.title)
+
     def tick(self, time_elapsed):
         ps = self.player_state
         ship_shape = self.level.ship.shape

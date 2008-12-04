@@ -42,6 +42,8 @@ class Player(object):
             self.targets += 1
     
     def object_destroyed(self, obj):
+        obj.destroyed = True
+        
         if (obj.target):
             self.targets -= 1
         
