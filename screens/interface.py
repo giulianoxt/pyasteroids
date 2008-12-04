@@ -273,6 +273,7 @@ class Radar(FrameView):
         ast = self.level.asteroids
         plnt = self.level.planets
         shots = self.level.shots
+	enemy_shots = self.level.enemy_shots
         missiles = self.level.missiles
         portals = self.level.portals
 
@@ -302,6 +303,9 @@ class Radar(FrameView):
         
         for obj in shots:
             self.draw_square(obj.shape.position, 1.5, (1.,1.,1.))
+	    
+        for obj in enemy_shots:
+            self.draw_square(obj.shape.position, 1.5, (1.,1.,1.))	    
         
         for obj in missiles:
             self.draw_square(obj.shape.position, 3, (.8,.8,.8))

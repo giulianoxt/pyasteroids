@@ -95,7 +95,8 @@ class SimpleShoot(Object):
         if (self.elapsed >= self.duration):
             self.lvl.remove_object(self)
             
-    def collided_with_asteroid(self, ast):        
+    def collided_with_asteroid(self, ast):
+		    
         l = [('remove', self)]
         
         if (ast.destructible):
@@ -107,3 +108,21 @@ class SimpleShoot(Object):
         return l
         
     collided_with_planet = collided_with_asteroid
+
+class SimpleShootInvasor(Object):
+    def __init__(self, model, shape, element, lvl, duration, damage):
+        Object.__init__(self, model, shape, element)
+        
+        self.duration = duration
+        self.elapsed = 0.0
+        self.lvl = lvl
+        self.damage = damage
+        
+    def tick(self, time_elapsed):
+        Object.tick(self, time_elapsed)
+        
+        self.elapsed += time_elapsed
+        
+        if (self.elapsed >= self.duration):
+            self.lvl.remove_object(self)
+           

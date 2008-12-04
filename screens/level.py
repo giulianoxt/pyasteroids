@@ -25,7 +25,7 @@ from objects.planet import Planet
 from objects.asteroid import Asteroid
 from objects.spaceship import SpaceShip
 from objects.particles import ParticleSystem
-from objects.gun import SimpleGun, SimpleShoot
+from objects.gun import SimpleGun, SimpleShoot, SimpleShootInvasor
 from objects.missile import SimpleMissile, Missile
 
 from game.state import Player
@@ -54,8 +54,10 @@ class Level(object):
         self.particles = set()
         self.missiles = set()
         self.ship = None
+	self.models = {}
+	self.enemy_shots = set()
         
-        self.has_skybox = Config('game', 'OpenGL').get('skybox')
+        self.has_skybox = False
         
         cfg = Config('levels',str(level_number))
         
@@ -89,6 +91,8 @@ class Level(object):
             self.ship = obj
         elif (xisinstance(obj, Object)):
             self.objects.add(obj)
+	elif(xisinstance(obj, SimpleShootInvasor)):
+	    self.enemy_shots.add(obj)
         else:
             raise NotImplementedError()
 
@@ -109,13 +113,15 @@ class Level(object):
             self.ship = None
         elif (xisinstance(obj, Object)):
             self.objects.remove(obj)
+	elif (xisinstance(obj, SimpleShootInvasor)):
+	    self.enemy_shots.remove(obj) 
         else:
             raise NotImplementedError
     
     def all_objects(self):
         return chain(
             self.shots, self.portals, self.planets, self.missiles,
-            self.asteroids, (self.ship,), self.objects, self.particles
+            self.asteroids, (self.ship,), self.objects, self.particles, self.enemy_shots
         )
     
     def load_file(self, level_name):
@@ -126,7 +132,7 @@ class Level(object):
 
         self.time = float(lvl['time']) * 60
 
-        models = {}
+        #models = {}
 
         for element in lvl['elements']:
             file = open('resources/models/'+element['model']['file'], 'r')
@@ -141,7 +147,7 @@ class Level(object):
             
             gl_model = GLModel(file, translate, rotate, scale, rc)
             
-            models[name] = (gl_model, element)            
+            self.models[name] = (gl_model, element)            
             
             file.close()
         
@@ -163,7 +169,7 @@ class Level(object):
             
             shape = None
             
-            model, element = models[element_name]
+            model, element = self.models[element_name]
             
             mass = float(object['mass'])
             
@@ -193,6 +199,9 @@ class Level(object):
             type = element['type']
                                     
             _object = type_class[type](model, shape, element)
+	    
+	    if ( type == 'asteroid' ):
+		    _object.asteroid_type = object['movement']['asteroid_type']
             
             obj_set.add(_object)
             
@@ -204,8 +213,8 @@ class Level(object):
         
         Player.get_instance().beginning_level(self)
         
-        self.make_spaceship(lvl, models)
-        self.make_guns(models)
+        self.make_spaceship(lvl, self.models)
+        self.make_guns(self.models)
 
     def make_spaceship(self, lvl, models):
         pos = None
@@ -217,7 +226,7 @@ class Level(object):
             
         shape = Shape(lvl['ship']['mass'], pos)
         
-        model, element = models[lvl['ship']['model']]
+        model, element = self.models[lvl['ship']['model']]
         
         self.ship = SpaceShip(model, shape, element, self)
 
@@ -246,6 +255,25 @@ class Level(object):
     def tick(self, time_elapsed):
         for obj in tuple(self.all_objects()):
             obj.tick(time_elapsed)
+	    if (xisinstance(obj, Asteroid)):
+		    if (obj.shot):
+			    #
+			    _info = {
+			    'destructible'    : False,
+        		    'destroys_player' : False,
+        		    'target'          : False
+			    }
+			    vec_dir = (self.ship.shape.position - obj.shape.position).normalizing().scalar(50.)
+			    bullet_pos = obj.shape.position
+			    shape_bull = Shape(0.01, bullet_pos)
+			    shape_bull.velocity = vec_dir
+			    #
+			    print shape_bull.velocity.x, shape_bull.velocity.y, shape_bull.velocity.z
+			    #(self, model, shape, element, lvl, duration, damage)
+			    obj_sh = SimpleShootInvasor(self.models['InvasorSimpleGun'][0], shape_bull, _info, self, 20, 5)
+			    self.add_object(obj_sh)
+			    #
+			    obj.shot = False
 
         self.wrap_ship()
         

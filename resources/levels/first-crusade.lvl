@@ -20,7 +20,7 @@ elements:
                 subtitle: Jupiter moon
 
                 # Type indica como o jogo irá interpretar esse elemento (planet, asteroid, portais, (?))
-                type: planet
+                type: asteroid
 
                 model:
                         # Caminho para o modelo deste elemento (partindo de resources/models)
@@ -127,6 +127,24 @@ elements:
                 target: no
 
         -
+                name: InvasorSimpleGun
+                subtitle:
+
+                type: gun
+
+                model:
+                        file: projectiles/simple.ply
+                        scale: 1.0
+                        rotate: [0,0,0]
+                        translate: [0,0,0]
+                
+                destructible: no
+                
+                destroys_player: no
+                
+                target: no
+
+        -
                 name: SimpleMissile
                 subtitle:
 
@@ -190,6 +208,7 @@ scene:
 
                         movement:
                                 type: orbit
+                                asteroid_type: rock
                                 # Id do objeto central da órbita
                                 center_planet_id: 1
                                 radius: 120
@@ -204,12 +223,29 @@ scene:
                 -
                         element: Io
                         rotation_velocity: [0,180,0]
-
                         movement:
                                 type: orbit
+                                asteroid_type: rock
                                 # Id do objeto central da órbita
                                 center_planet_id: 1
                                 radius: 130
+                                rot_xy: 0.0
+                                rot_z: 1.5
+                                rot_velocity_xy: 1.0
+                                rot_velocity_z: 0.
+                            
+
+                        mass: 50
+                -
+                        element: Io
+                        rotation_velocity: [0,180,0]
+
+                        movement:
+                                type: orbit
+                                asteroid_type: artificial
+                                # Id do objeto central da órbita
+                                center_planet_id: 1
+                                radius: 200
                                 rot_xy: 0.0
                                 rot_z: 1.5
                                 rot_velocity_xy: 1.0
