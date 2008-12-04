@@ -55,13 +55,17 @@ class Level(object):
         self.missiles = set()
         self.ship = None
         
+        self.has_skybox = Config('game', 'OpenGL').get('skybox')
+        
         cfg = Config('levels',str(level_number))
         
         level_name = cfg.get('name')    
         self.load_file(level_name)
         
         skybox = cfg.get('skybox')
-        self.setup_skybox('resources/'+skybox)
+        
+        if (self.has_skybox):
+            self.setup_skybox('resources/'+skybox)
         
         self.first = True
     
@@ -233,7 +237,8 @@ class Level(object):
         
         self.camera.put_in_position()
         
-        self.draw_skybox(self.camera.pos)
+        if (self.has_skybox):
+            self.draw_skybox(self.camera.pos)
 
         for obj in self.all_objects():
             obj.draw()
@@ -248,7 +253,8 @@ class Level(object):
         
         self.camera.tick(time_elapsed)
         
-        self.update_skybox(time_elapsed)
+        if (self.has_skybox):
+            self.update_skybox(time_elapsed)
         
         self.check_collisions(time_elapsed)
         

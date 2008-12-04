@@ -199,6 +199,8 @@ class GuidedMissile(FrameView):
         self.lock_obj = None
         
         self.camera_dist = Config('interface', 'GuidedMissile').get('camera_dist')
+        
+        self.has_skybox = Config('game', 'OpenGL').get('skybox')
     
     def lock(self, obj):
         self.lock_obj = obj
@@ -223,7 +225,8 @@ class GuidedMissile(FrameView):
         
         self.setup_camera()
         
-        self.level.draw_skybox(self.camera_pos)
+        if (self.has_skybox):
+            self.level.draw_skybox(self.camera_pos)
         
         for obj in self.level.all_objects():
             obj.draw()
