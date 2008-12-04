@@ -114,6 +114,10 @@ class Missile(Object):
             if (ast.hp <= 0):
                 Player.get_instance().object_destroyed(ast)
                 l.append(('remove', ast))
+            
+            self.lvl.controller.push_screen('MovingMessage', 'Show_Missile_Hit')
+        else:
+            self.lvl.controller.push_screen('MovingMessage', 'Show_Missile_Miss')
         
         return l
 

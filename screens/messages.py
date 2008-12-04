@@ -135,4 +135,5 @@ class MovingMessage(FadeMessage):
     def draw(self):
         FadeMessage.draw(self)
         
-        self.rect = self.bounding_text_rect
+        if (self.color.alpha() == 0):
+            self.rect = self.bounding_text_rect

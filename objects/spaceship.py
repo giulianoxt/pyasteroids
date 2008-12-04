@@ -189,5 +189,26 @@ class SpaceShip(Object):
         
         if (obj.hostile):
             Player.get_instance().got_hit(obj)
+            self.level.controller.push_screen('FadeMessage', 'Ship_Hit')
 
-        self.level.controller.push_screen('FadeMessage', 'Ship_Hit')
+        v1i = self.shape.velocity
+        v2i = None
+        
+        if (hasattr(obj.shape, 'fake_vel')):
+            v2i = obj.shape.fake_vel
+        else:
+            v2i = obj.shape.velocity
+        
+        m1 = self.shape.mass
+        m2 = obj.shape.mass
+        
+        e = 1. # ellastic collision
+        
+        n = (obj.shape.position - self.shape.position).normalizing()
+        c = n * (v1i - v2i)
+        
+        v1f = v1i - n.scalar(((m2*c)/(m1+m2)) * (1 + e))
+        #v2f = v2i + n.scalar(((m1*c)/(m1+m2)) * (1 + e)) 
+        
+        self.shape.velocity = v1f
+        #obj.shape.velocity = v2f

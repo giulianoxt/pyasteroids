@@ -44,11 +44,15 @@ class Shape:
 		if (self.rotation_radius is None):
 			return
 		
+		previous_pos = self.position.scalar(1.)
+		
 		self.rot_xy = self.rot_xy + self.rot_vel_xy*delta
 		self.rot_z = self.rot_z + self.rot_vel_z*delta
 		self.position.x = self.rotation_center.x + self.rotation_radius*sin(self.rot_z)*cos(self.rot_xy)
 		self.position.y = self.rotation_center.y + self.rotation_radius*sin(self.rot_z)*sin(self.rot_xy)	
 		self.position.z = self.rotation_center.z + self.rotation_radius*cos(self.rot_z)	
+		
+		self.fake_vel = (self.position - previous_pos).scalar(1. / delta)
 		
 	def calculate_aceleration(self):
 		self.aceleration = sum(chain(self.forces, self.forces_tmp), Vector3d(0.,0.,0.))

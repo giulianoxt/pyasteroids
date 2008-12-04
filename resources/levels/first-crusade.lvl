@@ -221,5 +221,5 @@ scene:
 
 ship:
         model: Simple-Spaceship
-        mass: 50
+        mass: 30
         camera-dist: 13

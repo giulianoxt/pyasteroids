@@ -167,8 +167,11 @@ class GLController(QGLWidget):
 
     def pop_screen(self, screen):
         # erases that screen and all above it
-        i = self.screen_stack.index(screen)
-        del self.screen_stack[i:]
+        try:
+            i = self.screen_stack.index(screen)
+            del self.screen_stack[i:]
+        except ValueError:
+            pass
 
     def push_screen(self, new_screen_name, *args, **kwargs):   
         NewScreenCls = None
