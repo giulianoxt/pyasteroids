@@ -4,7 +4,7 @@ class Asteroid(Object):
     def __init__(self, model, shape, element):
         Object.__init__(self, model, shape, element)
 	self.asteroid_type = None
-	self.shot_tick_interval = 10
+	self.shot_tick_interval = 100
 	self.shot_tick_counter = 0
 	self.shot = False
 

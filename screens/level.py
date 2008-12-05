@@ -27,6 +27,7 @@ from objects.spaceship import SpaceShip
 from objects.particles import ParticleSystem
 from objects.gun import SimpleGun, SimpleShoot, SimpleShootInvasor
 from objects.missile import SimpleMissile, Missile
+from objects.enemyship import EnemyShip
 
 from game.state import Player
 
@@ -56,6 +57,7 @@ class Level(object):
         self.ship = None
 	self.models = {}
 	self.enemy_shots = set()
+	self.enemy_ships = set()
         
         self.has_skybox = False
         
@@ -93,6 +95,8 @@ class Level(object):
             self.objects.add(obj)
 	elif(xisinstance(obj, SimpleShootInvasor)):
 	    self.enemy_shots.add(obj)
+	elif(xisinstance(obj, EnemyShip)):
+	    self.enemy_ships.add(obj)
         else:
             raise NotImplementedError()
 
@@ -115,13 +119,16 @@ class Level(object):
             self.objects.remove(obj)
 	elif (xisinstance(obj, SimpleShootInvasor)):
 	    self.enemy_shots.remove(obj) 
+	elif (xisinstance(obj, EnemyShip)):
+	    self.enemy_ships.remove(obj)
         else:
             raise NotImplementedError
     
     def all_objects(self):
         return chain(
             self.shots, self.portals, self.planets, self.missiles,
-            self.asteroids, (self.ship,), self.objects, self.particles, self.enemy_shots
+            self.asteroids, (self.ship,), self.objects, self.particles, self.enemy_shots,
+	    self.enemy_ships
         )
     
     def load_file(self, level_name):
@@ -158,6 +165,7 @@ class Level(object):
             'asteroid'     : Asteroid,
             'start_portal' : Portal,
             'end_portal'   : Portal,
+	    'enemyship'	   : EnemyShip
         }
         
         id_table = { }
@@ -191,6 +199,10 @@ class Level(object):
                 shape.rot_vel_z = object['movement']['rot_velocity_z']
                 shape.rot_xy = object['movement']['rot_xy']
                 shape.rot_z = object['movement']['rot_z']
+            elif (movement == 'dynamic'):
+                pos = Vector3d(*object['pos'])
+                shape = Shape(mass, pos)
+                shape.velocity = Vector3d(*object['movement']['velocity'])
 
             shape.velocity_angular_x = rvel[0]
             shape.velocity_angular_y = rvel[1]
@@ -202,6 +214,9 @@ class Level(object):
 	    
 	    if ( type == 'asteroid' ):
 		    _object.asteroid_type = object['movement']['asteroid_type']
+            elif ( type == 'enemyship' ):
+		    _object.level = self
+		    _object.gun_pos = Vector3d(*object['gun_position'])
             
             obj_set.add(_object)
             
@@ -268,7 +283,6 @@ class Level(object):
 			    shape_bull = Shape(0.01, bullet_pos)
 			    shape_bull.velocity = vec_dir
 			    #
-			    print shape_bull.velocity.x, shape_bull.velocity.y, shape_bull.velocity.z
 			    #(self, model, shape, element, lvl, duration, damage)
 			    obj_sh = SimpleShootInvasor(self.models['InvasorSimpleGun'][0], shape_bull, _info, self, 20, 5)
 			    self.add_object(obj_sh)

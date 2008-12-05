@@ -64,6 +64,26 @@ elements:
                 target: no
 
         -
+                name: EnemyShip
+                subtitle: Deadlock I
+
+                type: enemyship
+
+                model:
+                        file: planets/neptune.ply
+                        scale: 45
+                        rotate: [0,0,0]
+                        translate: [0,0,0]
+                        radius_correction: -65                      
+
+                destructible: no
+
+                destroys_player: yes
+                damage: 1000
+                
+                target: no
+
+        -
                 name: Begin
                 subtitle: Start portal
 
@@ -201,6 +221,21 @@ scene:
                                 type: static
                                 
                         mass: 50
+
+                -
+                        # Precisa desse id para referenciar quando for criar órbita, ali embaixo
+                        id: 2
+                        element: EnemyShip
+                        pos: [-350,0,-1000]
+                        rotation_velocity: [0,0,0]
+
+                        movement:
+                                type: dynamic
+                                velocity: [0, 0, 30]
+                                
+                        mass: 50
+
+                        gun_position: [0, 100, 0]
 
                 -
                         element: Io

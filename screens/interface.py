@@ -276,6 +276,7 @@ class Radar(FrameView):
 	enemy_shots = self.level.enemy_shots
         missiles = self.level.missiles
         portals = self.level.portals
+	enemy_ships = self.level.enemy_ships
 
         pos = self.level.ship.shape.position
         ship_x, ship_y = self.convert_to_local(pos)
@@ -305,7 +306,10 @@ class Radar(FrameView):
             self.draw_square(obj.shape.position, 1.5, (1.,1.,1.))
 	    
         for obj in enemy_shots:
-            self.draw_square(obj.shape.position, 1.5, (1.,1.,1.))	    
+            self.draw_square(obj.shape.position, 1.5, (1.,0.,1.))
+	    	    
+        for obj in enemy_ships:
+            self.draw_square(obj.shape.position, 5, (0.,0.,1.))	    		    
         
         for obj in missiles:
             self.draw_square(obj.shape.position, 3, (.8,.8,.8))
